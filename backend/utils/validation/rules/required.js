@@ -1,0 +1,1 @@
+module.exports = function required(msg = 'Campo obligatorio') { return function(value) { if (value === null || value === undefined || String(value).trim() === '') return { valid: false, message: msg }; return { valid: true }; }; };
