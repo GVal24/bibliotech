@@ -1,70 +1,84 @@
-# <img src="frontend/img/favicon-gold.png" width="45" height="45" align="center"> SampleVault
+# <img src=\"frontend/img/favicon-gold.png\" width=\"45\" height=\"45\" align=\"center\"> Bibliotech
 
-**SampleVault** es una aplicación web diseñada para la gestión profesional de librerías de sonido. Permite a los productores musicales subir, categorizar, escuchar y organizar sus muestras de audio (samples) de forma privada y segura, todo bajo una arquitectura modular y eficiente.
+**Bibliotech** es una biblioteca digital que permite gestionar documentos digitales en formato PDF: subir, catalogar, visualizar, descargar y administrar el material bibliogr�fico. Cuenta con dos roles (Administrador y Cliente), arquitectura en N capas, validaci�n modular, manejador de lenguaje y cumple con principios SOLID.
 
 ---
 
-## 🚀 Características Principales
+## Caracter�sticas Principales
 
-* **Gestión de Samples:** Sube archivos de audio (MP3, WAV, OGG, FLAC) con metadatos personalizados (BPM, categoría).
-* **Reproductor Integrado:** Escucha tus sonidos directamente desde la biblioteca mediante una interfaz minimalista.
-* **Arquitectura Limpia:** Separación total de responsabilidades entre controladores, servicios y utilidades.
-* **Frontend "Zero innerHTML":** Manipulación del DOM 100% nativa para máxima seguridad y rendimiento.
-* **Sostenibilidad de Software:** Código optimizado siguiendo principios de eficiencia en el consumo de recursos (inspirado en el modelo **GREENSOFT**).
+* **Gesti�n documental:** Subida de archivos PDF con metadatos (t�tulo, autor, ISBN, categor�a/materia, a�o, descripci�n).
+* **Lectura y descarga:** Visualizaci�n c�moda del PDF directamente en el sitio + opci�n para descargarlo.
+* **Dos roles:** Cliente (consulta/visualizaci�n/descarga) y Administrador (alta, baja, modificaci�n de documentos y gesti�n b�sica).
+* **Arquitectura limpia:** Separaci�n de responsabilidades entre controladores, repositorios, servicios y utilidades, cumpliendo con la estructura de N capas.
+* **Validaci�n modular + Manejador de lenguaje:** Validaci�n desacoplada del dominio y mensajes centralizados (reutilizable).
+* **Frontend "Zero innerHTML":** Manipulaci�n del DOM 100% nativa.
+* **Sostenibilidad de Software:** Enfoque modular y reutilizable inspirado en GREENSOFT.
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnolog�as Utilizadas
 
 ### Backend
 * **Node.js & Express:** Servidor robusto y escalable.
-* **Multer:** Gestión eficiente de subida de archivos binarios.
-* **MySQL/MariaDB:** Persistencia de metadatos de forma relacional.
+* **Multer:** Gesti�n de subida de archivos PDF.
+* **MySQL/MariaDB:** Persistencia relacional con procedimientos almacenados (SPs).
+* **jsonwebtoken & bcrypt:** Autenticaci�n y autorizaci�n por roles (JWT).
+* **dotenv/cors:** Configuraci�n y CORS.
 
 ### Frontend
-* **Vanilla JavaScript:** Lógica pura sin dependencias de frameworks pesados.
-* **W3.CSS:** Framework CSS ligero para una interfaz moderna y responsiva.
-* **Web Components (Custom):** Manejo dinámico de la UI mediante inyección de nodos nativos.
+* **Vanilla JavaScript:** L�gica pura, sin frameworks pesados.
+* **W3.CSS:** CSS ligero y responsivo.
+* **Web Components (Custom):** UI din�mica mediante nodos nativos.
 
 ---
 
-### Inicialización del Backend:
-Entra en la carpeta del servidor e instala las dependencias necesarias:
-```bash
+## Configuraci�n e Instalaci�n
+
+### Inicializaci�n del Backend
+`ash
 cd backend
-npm init -y  # Crea el archivo package.json por defecto
-```
-### Instalación de módulos:
-Ejecuta este comando para instalar todas las bibliotecas que configuramos en los scripts:
-```bash
-npm install express mysql2 cors multer jsonwebtoken bcrypt dotenv
-```
-### Agregar archivo .env en el directorio backend/ con estas variables como ejemplo:
-```text
+npm install
+`
+
+### Variables de entorno (.env) en backend/
+`	ext
 PORT=3000
 DB_HOST=localhost
-DB_USER=samplevault
-DB_PASS=samplevault
-DB_NAME=samplevault
+DB_USER=bibliotech
+DB_PASS=bibliotech
+DB_NAME=bibliotech
 JWT_SECRET=tu_clave_secreta_super_segura
 NODE_ENV=production
-```
-## 📂 Estructura del Proyecto
+`
 
-```text
-├── backend/
-│   ├── config/          # Configuración de Multer y DB.
-│   ├── controllers/     # Lógica de negocio.
-│   ├── repositories/    # Acceso a datos (SQL).
-│   ├── routes/          # Rutas de acceso a módulos del backend.
-│   ├── uploads/         # Almacenamiento físico de sonidos.
-│   └── utils/           # Helpers de sistema de archivos (fileHelper).
-├── frontend/
-│   ├── css/             # Estilos personalizados.
-│   ├── html/            # Archivos de maquetación estáticos.
-│   ├── img/             # Activos visuales (favicon.png).
-│   └── js/
-│       ├── components/  # Manejadores de UI dinámicos (uiHandlers.js).
-│       ├── frontControllers/  # Controladores de lógica frontend.
-│       ├── services/    # Cliente API (apiService.js).
-│       ├── utils/  # Lógica de sesión (authHelper.js).
-│       └── tests/  # Scripts necesarios para crear el frontend de los tests.
-├── test-samples/ #samples de prueba para subir.
+### Base de datos
+Ejecutar ackend/config/init.sql en MySQL/MariaDB para crear esquema, usuario con privilegios m�nimos (SELECT, EXECUTE), tablas, roles y SPs.
+
+## Estructura del Proyecto
+
+`	ext
+backend/
+  config/          # db, multer, init.sql, delete.sql
+  controllers/     # L�gica de negocio
+  middleware/      # Autenticaci�n/autorizaci�n
+  repositories/    # Acceso a datos (SPs)
+  routes/          # Rutas API
+  uploads/documents/ # Almacenamiento de PDFs
+  utils/           # Helpers, validaci�n modular, manejador de lenguaje
+frontend/
+  css/             # Estilos
+  html/            # Vistas (cliente/admin/login/registro)
+  img/             # Activos visuales
+  js/
+    components/    # UI handlers
+    frontControllers/ # Controladores frontend
+    services/      # apiService
+    utils/         # authHelper
+    tests/         # Tests
+`
+
+## Uso
+
+1. Configurar .env y base de datos.
+2. Iniciar backend: 
+ode server.js (desde ackend/).
+3. Acceder desde frontend (vistas servidas por Express).
+4. Roles: dmin (gestiona documentos) / client (consulta y descarga).
