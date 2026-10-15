@@ -1,4 +1,4 @@
-# <img src="frontend/img/logo.jfif" width="200" align="center">  Bibliotech
+# <img src="frontend/img/logo.png" width="200" align="center">  Bibliotech
 
 **Bibliotech** es una biblioteca digital que permite gestionar documentos digitales en formato PDF: subir, catalogar, visualizar, descargar y administrar el material bibliográfico. Cuenta con dos roles (Administrador y Cliente), arquitectura en N capas, validación modular, manejador de lenguaje y cumple con principios SOLID.
 **Bibliotech** es una biblioteca digital que permite gestionar documentos digitales en formato PDF: subir, catalogar, visualizar, descargar y administrar el material bibliográfico. Cuenta con dos roles (Administrador y Cliente), arquitectura en N capas, validación modular, manejador de lenguaje y cumple con principios SOLID.
