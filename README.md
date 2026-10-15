@@ -1,30 +1,30 @@
-# <img src=\"frontend/img/favicon-gold.png\" width=\"45\" height=\"45\" align=\"center\"> Bibliotech
+# <img src=\"frontend/img/logo.png\" width=\"45\" height=\"45\" align=\"center\">  Bibliotech
 
-**Bibliotech** es una biblioteca digital que permite gestionar documentos digitales en formato PDF: subir, catalogar, visualizar, descargar y administrar el material bibliogr�fico. Cuenta con dos roles (Administrador y Cliente), arquitectura en N capas, validaci�n modular, manejador de lenguaje y cumple con principios SOLID.
+**Bibliotech** es una biblioteca digital que permite gestionar documentos digitales en formato PDF: subir, catalogar, visualizar, descargar y administrar el material bibliográfico. Cuenta con dos roles (Administrador y Cliente), arquitectura en N capas, validación modular, manejador de lenguaje y cumple con principios SOLID.
 
 ---
 
-## Caracter�sticas Principales
+## Características Principales
 
-* **Gesti�n documental:** Subida de archivos PDF con metadatos (t�tulo, autor, ISBN, categor�a/materia, a�o, descripci�n).
-* **Lectura y descarga:** Visualizaci�n c�moda del PDF directamente en el sitio + opci�n para descargarlo.
-* **Dos roles:** Cliente (consulta/visualizaci�n/descarga) y Administrador (alta, baja, modificaci�n de documentos y gesti�n b�sica).
-* **Arquitectura limpia:** Separaci�n de responsabilidades entre controladores, repositorios, servicios y utilidades, cumpliendo con la estructura de N capas.
-* **Validaci�n modular + Manejador de lenguaje:** Validaci�n desacoplada del dominio y mensajes centralizados (reutilizable).
-* **Frontend "Zero innerHTML":** Manipulaci�n del DOM 100% nativa.
+* **Gestión documental:** Subida de archivos PDF con metadatos (título, autor, ISBN, categoría/materia, año, descripción).
+* **Lectura y descarga:** Visualización cómoda del PDF directamente en el sitio + opción para descargarlo.
+* **Dos roles:** Cliente (consulta/visualización/descarga) y Administrador (alta, baja, modificación de documentos y gestión básica).
+* **Arquitectura limpia:** Separación de responsabilidades entre controladores, repositorios, servicios y utilidades, cumpliendo con la estructura de N capas.
+* **Validación modular + Manejador de lenguaje:** Validación desacoplada del dominio y mensajes centralizados (reutilizable).
+* **Frontend "Zero innerHTML":** Manipulación del DOM 100% nativa.
 * **Sostenibilidad de Software:** Enfoque modular y reutilizable inspirado en GREENSOFT.
 
 ## Tecnolog�as Utilizadas
 
 ### Backend
 * **Node.js & Express:** Servidor robusto y escalable.
-* **Multer:** Gesti�n de subida de archivos PDF.
+* **Multer:** Gestión de subida de archivos PDF.
 * **MySQL/MariaDB:** Persistencia relacional con procedimientos almacenados (SPs).
-* **jsonwebtoken & bcrypt:** Autenticaci�n y autorizaci�n por roles (JWT).
-* **dotenv/cors:** Configuraci�n y CORS.
+* **jsonwebtoken & bcrypt:** Autenticación y autorización por roles (JWT).
+* **dotenv/cors:** Configuración y CORS.
 
 ### Frontend
-* **Vanilla JavaScript:** L�gica pura, sin frameworks pesados.
+* **Vanilla JavaScript:** Lógica pura, sin frameworks pesados.
 * **W3.CSS:** CSS ligero y responsivo.
 * **Web Components (Custom):** UI din�mica mediante nodos nativos.
 
