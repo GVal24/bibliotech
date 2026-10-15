@@ -1,11 +1,19 @@
 # <img src=\"frontend/img/logo.png\" width=\"45\" height=\"45\" align=\"center\">  Bibliotech
 
 **Bibliotech** es una biblioteca digital que permite gestionar documentos digitales en formato PDF: subir, catalogar, visualizar, descargar y administrar el material bibliográfico. Cuenta con dos roles (Administrador y Cliente), arquitectura en N capas, validación modular, manejador de lenguaje y cumple con principios SOLID.
+**Bibliotech** es una biblioteca digital que permite gestionar documentos digitales en formato PDF: subir, catalogar, visualizar, descargar y administrar el material bibliográfico. Cuenta con dos roles (Administrador y Cliente), arquitectura en N capas, validación modular, manejador de lenguaje y cumple con principios SOLID.
 
 ---
 
 ## Características Principales
+## Características Principales
 
+* **Gestión documental:** Subida de archivos PDF con metadatos (título, autor, ISBN, categoría/materia, año, descripción).
+* **Lectura y descarga:** Visualización cómoda del PDF directamente en el sitio + opción para descargarlo.
+* **Dos roles:** Cliente (consulta/visualización/descarga) y Administrador (alta, baja, modificación de documentos y gestión básica).
+* **Arquitectura limpia:** Separación de responsabilidades entre controladores, repositorios, servicios y utilidades, cumpliendo con la estructura de N capas.
+* **Validación modular + Manejador de lenguaje:** Validación desacoplada del dominio y mensajes centralizados (reutilizable).
+* **Frontend "Zero innerHTML":** Manipulación del DOM 100% nativa.
 * **Gestión documental:** Subida de archivos PDF con metadatos (título, autor, ISBN, categoría/materia, año, descripción).
 * **Lectura y descarga:** Visualización cómoda del PDF directamente en el sitio + opción para descargarlo.
 * **Dos roles:** Cliente (consulta/visualización/descarga) y Administrador (alta, baja, modificación de documentos y gestión básica).
@@ -19,11 +27,15 @@
 ### Backend
 * **Node.js & Express:** Servidor robusto y escalable.
 * **Multer:** Gestión de subida de archivos PDF.
+* **Multer:** Gestión de subida de archivos PDF.
 * **MySQL/MariaDB:** Persistencia relacional con procedimientos almacenados (SPs).
+* **jsonwebtoken & bcrypt:** Autenticación y autorización por roles (JWT).
+* **dotenv/cors:** Configuración y CORS.
 * **jsonwebtoken & bcrypt:** Autenticación y autorización por roles (JWT).
 * **dotenv/cors:** Configuración y CORS.
 
 ### Frontend
+* **Vanilla JavaScript:** Lógica pura, sin frameworks pesados.
 * **Vanilla JavaScript:** Lógica pura, sin frameworks pesados.
 * **W3.CSS:** CSS ligero y responsivo.
 * **Web Components (Custom):** UI din�mica mediante nodos nativos.
