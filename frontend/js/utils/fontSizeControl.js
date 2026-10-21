@@ -58,6 +58,11 @@
     function buildControl(container) {
         container.classList.add('bt-a11y');
 
+        // W3.CSS le pone overflow:hidden a .w3-bar, lo que recortaría el panel
+        // desplegable. Permitimos que la barra muestre contenido desbordado.
+        const bar = container.closest('.w3-bar');
+        if (bar) bar.classList.add('bt-bar-overflow');
+
         // Botón-ícono
         const toggle = document.createElement('button');
         toggle.type = 'button';

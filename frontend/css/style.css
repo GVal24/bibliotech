@@ -183,6 +183,8 @@ a:hover { color: var(--accent-strong); }
 }
 
 /* ---------- Accesibilidad: control de tamaño de fuente ---------- */
+/* W3.CSS aplica overflow:hidden a .w3-bar y recortaría el panel desplegable. */
+.w3-bar.bt-bar-overflow { overflow: visible !important; }
 .bt-a11y {
     position: relative;
     display: inline-block;
