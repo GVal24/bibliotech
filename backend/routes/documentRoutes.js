@@ -70,7 +70,8 @@ router.post('/:id/reject', hasRole('admin', 'professor'), documentController.rej
 router.put('/:id', hasRole('admin'), documentController.updateDocument);
 
 // Eliminar un documento: DELETE /api/documents/:id
-router.delete('/:id', hasRole('admin'), documentController.deleteDocument);
+// Professor y Admin pueden borrar. El Student NO.
+router.delete('/:id', hasRole('admin', 'professor'), documentController.deleteDocument);
 
 // Ver un documento puntual: GET /api/documents/:id
 // (al final para no eclipsar las rutas fijas de arriba)

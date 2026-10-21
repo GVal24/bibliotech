@@ -367,7 +367,7 @@ class DocumentController
         }
     }
 
-    // DELETE /api/documents/:id  (solo admin)
+    // DELETE /api/documents/:id  (solo professor/admin)
     async deleteDocument(req, res)
     {
         try

@@ -38,7 +38,7 @@ Los colores se definen como variables CSS en `frontend/css/style.css` bajo
 | Rol | Puede hacer |
 | --- | --- |
 | **Student** | Consulta el catálogo público y puede **proponer material** (queda en estado `pending` hasta ser aprobado). |
-| **Professor** | Publica material **directamente** y **aprueba/rechaza** el material propuesto por los Students. |
+| **Professor** | Publica material **directamente**, **aprueba/rechaza** lo propuesto por los Students y puede **borrar documentos** del catálogo. |
 | **Admin** | Todo: gestión de documentos, usuarios y asignación de roles. |
 
 Estados de un documento (patrón *State*):
@@ -168,7 +168,7 @@ Documentos:
 * `POST /api/documents/:id/approve` — aprobar (Profesor/Admin).
 * `POST /api/documents/:id/reject` — rechazar (Profesor/Admin).
 * `PUT /api/documents/:id` — actualizar metadatos (solo admin).
-* `DELETE /api/documents/:id` — eliminar documento (solo admin).
+* `DELETE /api/documents/:id` — eliminar documento (Profesor/Admin). El Student NO puede borrar.
 
 > **Lectura pública vs. descarga:** cualquier visitante puede **leer online** el material
 > aprobado (`/file`), pero **descargar** (`/download`) requiere sesión. Como `<a>`/`<embed>`

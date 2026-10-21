@@ -164,9 +164,30 @@ function renderDocumentsTable(documents) {
         aDownload.download = doc.filename;
         tdActions.appendChild(aDownload);
 
+        // El profesor puede borrar material del catálogo.
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'w3-button w3-red w3-tiny w3-round w3-margin-left';
+        btnDelete.textContent = 'Borrar';
+        btnDelete.addEventListener('click', () => deleteDocument(doc.id));
+        tdActions.appendChild(btnDelete);
+
         row.append(tdTitle, tdAuthor, tdCategory, tdYear, tdActions);
         tbody.appendChild(row);
     });
+}
+
+// Borra un documento del catálogo (Professor/Admin)
+async function deleteDocument(id) {
+    if (!confirm('¿Estás seguro de borrar este documento? Esta acción no se puede deshacer.')) return;
+
+    try {
+        await apiService.request(`/documents/${id}`, 'DELETE');
+        showModal('Listo', 'Documento eliminado.');
+        loadPending();
+        loadDocuments();
+    } catch (error) {
+        showModal('Error', error.message);
+    }
 }
 
 function initDocForm() {
