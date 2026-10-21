@@ -6,8 +6,6 @@
 */
 
 const userRepo = require('../repositories/userRepo');
-const documentRepo = require('../repositories/documentRepo');
-const fileHelper = require('../utils/fileHelper');
 const lang = require('../utils/lang/LanguageManager');
 
 /**
@@ -60,7 +58,8 @@ class AdminController
         }
     }
 
-    // Eliminar al usuario y sus archivos
+    // Eliminar al usuario CONSERVANDO el material que subió a la biblioteca.
+    // Los documentos quedan "sin dueño" (documents.user_id = NULL, ON DELETE SET NULL).
     async deleteUser(req, res)
     {
         try
@@ -73,25 +72,16 @@ class AdminController
                 return res.status(403).json({ message: lang.t('admin.user.selfDelete') });
             }
 
-            // 2. Verificar si el usuario existe y obtener sus documentos
-            const userDocuments = await documentRepo.findByUserId(targetUserId);
-            
-            // 3. Proceder con la eliminación en la DB (vía SP sp_delete_user)
+            // 2. Proceder con la eliminación en la DB (vía SP sp_delete_user).
+            //    Por la FK ON DELETE SET NULL, sus documentos NO se borran,
+            //    sólo pierden la referencia al usuario. Los archivos físicos se conservan.
             const success = await userRepo.delete(targetUserId);
 
             if (!success) {
                 return res.status(404).json({ message: lang.t('admin.user.notFound') });
             }
 
-            // 4. Limpieza de archivos físicos 
-            // Solo llegamos aquí si el usuario existía y fue borrado de la DB
-            userDocuments.forEach(document => {
-                fileHelper.deleteFile(document.file_path);
-            });
-
-            res.json({ 
-                message: `${lang.t('admin.user.deleted')} (${userDocuments.length} documentos removidos).` 
-            });
+            res.json({ message: lang.t('admin.user.deleted') });
         }
         catch (error)
         {

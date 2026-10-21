@@ -84,7 +84,7 @@ function renderPendingTable(documents) {
         tdAuthor.textContent = doc.author;
 
         const tdUser = document.createElement('td');
-        tdUser.textContent = doc.uploaded_by || '';
+        tdUser.textContent = doc.uploaded_by || 'Usuario eliminado';
 
         const tdCategory = document.createElement('td');
         tdCategory.textContent = doc.category || 'Sin categoría';

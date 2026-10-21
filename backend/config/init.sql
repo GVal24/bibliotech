@@ -44,9 +44,11 @@ CREATE TABLE users_roles (
 --      pending  -> subido por un Student, espera revisión de Professor/Admin
 --      approved -> visible en el catálogo público
 --      rejected -> rechazado por Professor/Admin, no se comparte
+--    user_id: puede quedar NULL (ON DELETE SET NULL). Al dar de baja un usuario,
+--    su material se CONSERVA en la biblioteca (pasa a "sin dueño").
 CREATE TABLE documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT NULL,
     filename VARCHAR(255) NOT NULL,
     title VARCHAR(200) NOT NULL,
     category VARCHAR(100),
@@ -54,7 +56,7 @@ CREATE TABLE documents (
     file_path VARCHAR(255) NOT NULL,
     status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- 7. InserciA3n de Datos Maestros (Roles)
@@ -150,7 +152,7 @@ BEGIN
     SELECT d.id, d.title, d.author, d.isbn, d.category, d.year, d.description,
            d.filename, d.file_path, d.status, d.created_at, u.username AS uploaded_by
     FROM documents d
-    JOIN users u ON d.user_id = u.id
+    LEFT JOIN users u ON d.user_id = u.id
     WHERE d.status = 'approved'
     ORDER BY d.created_at DESC;
 END //
@@ -161,7 +163,7 @@ BEGIN
     SELECT d.id, d.title, d.author, d.isbn, d.category, d.year, d.description,
            d.filename, d.file_path, d.status, d.created_at, u.username AS uploaded_by
     FROM documents d
-    JOIN users u ON d.user_id = u.id
+    LEFT JOIN users u ON d.user_id = u.id
     WHERE d.status = 'approved'
       AND (d.title LIKE CONCAT('%', p_term, '%')
         OR d.author LIKE CONCAT('%', p_term, '%')
@@ -182,7 +184,7 @@ BEGIN
     SELECT d.id, d.title, d.author, d.isbn, d.category, d.year, d.description,
            d.filename, d.file_path, d.status, d.created_at, u.username AS uploaded_by
     FROM documents d
-    JOIN users u ON d.user_id = u.id
+    LEFT JOIN users u ON d.user_id = u.id
     WHERE d.status = p_status
     ORDER BY d.created_at DESC;
 END //
@@ -193,7 +195,7 @@ BEGIN
     SELECT d.id, d.title, d.author, d.isbn, d.category, d.year, d.description,
            d.filename, d.file_path, d.status, d.created_at, u.username AS uploaded_by
     FROM documents d
-    JOIN users u ON d.user_id = u.id
+    LEFT JOIN users u ON d.user_id = u.id
     WHERE d.id = p_id;
 END //
 

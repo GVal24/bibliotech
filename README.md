@@ -62,6 +62,7 @@ son exclusivas de usuarios registrados.
 * **Descarga sólo para registrados:** Los visitantes anónimos pueden leer online; descargar exige cuenta.
 * **Tres roles:** Student (consulta, propone y descarga), Professor (publica y aprueba) y Administrador (gestión total + roles).
 * **Flujo de aprobación:** El material de los Students se revisa antes de publicarse.
+* **Baja de usuario sin perder material:** Al eliminar un usuario, sus documentos y archivos **se conservan** (quedan "sin dueño", `user_id = NULL`), preservando el catálogo de la biblioteca.
 * **Arquitectura limpia:** Separación de responsabilidades entre controladores, repositorios, servicios y utilidades, cumpliendo con la estructura de N capas.
 * **Validación modular (filtros) + Manejador de lenguaje:** Validación desacoplada del dominio (reglas `required`, `minLength`, `maxLength`, `pattern`, `usernameFormat`, `emailFormat`, `strongPassword`) y mensajes centralizados ES/EN.
 * **Control de tipos de archivo:** Lista blanca de extensiones (ver *Formatos admitidos*) y límite de tamaño.
@@ -178,7 +179,7 @@ Documentos:
 Administración:
 * `GET /api/admin/users` — listar usuarios (solo admin).
 * `PUT /api/admin/users/:id/role` — asignar rol `admin`/`professor`/`student` (solo admin).
-* `DELETE /api/admin/users/:id` — eliminar usuario (solo admin).
+* `DELETE /api/admin/users/:id` — eliminar usuario (solo admin). **El material que subió NO se borra**: sus documentos quedan "sin dueño" (`user_id = NULL`) y se conservan en la biblioteca.
 
 ## Formatos de archivo admitidos
 
