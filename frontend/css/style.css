@@ -182,6 +182,28 @@ a:hover { color: var(--accent-strong); }
     font-weight: 700;
 }
 
+/* ---------- Control de tamaño de fuente (accesibilidad) ---------- */
+.bt-fontsize-label {
+    color: var(--text-muted);
+    font-size: .85rem;
+    margin: 0 6px 0 4px;
+    vertical-align: middle;
+}
+.bt-fontsize-toggle {
+    background-color: transparent !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    cursor: pointer;
+    font-weight: 600;
+}
+.bt-fontsize-toggle:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+.bt-fontsize-toggle.is-active {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    background-color: var(--surface-2) !important;
+    font-weight: 700;
+}
+
 /* ---------- Landing / hero ---------- */
 .bt-hero {
     min-height: 60vh;

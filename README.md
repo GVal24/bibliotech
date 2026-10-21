@@ -63,6 +63,7 @@ son exclusivas de usuarios registrados.
 * **Tres roles:** Student (consulta, propone y descarga), Professor (publica y aprueba) y Administrador (gestión total + roles).
 * **Flujo de aprobación:** El material de los Students se revisa antes de publicarse.
 * **Baja de usuario sin perder material:** Al eliminar un usuario, sus documentos y archivos **se conservan** (quedan "sin dueño", `user_id = NULL`), preservando el catálogo de la biblioteca.
+* **Accesibilidad - tamaño de texto:** El navbar incluye un control (`A−`, `A`, `A+`, `A++`) para agrandar o achicar la fuente de todo el sitio, pensado para personas con baja visión. La preferencia se guarda en `localStorage`.
 * **Arquitectura limpia:** Separación de responsabilidades entre controladores, repositorios, servicios y utilidades, cumpliendo con la estructura de N capas.
 * **Validación modular (filtros) + Manejador de lenguaje:** Validación desacoplada del dominio (reglas `required`, `minLength`, `maxLength`, `pattern`, `usernameFormat`, `emailFormat`, `strongPassword`) y mensajes centralizados ES/EN.
 * **Control de tipos de archivo:** Lista blanca de extensiones (ver *Formatos admitidos*) y límite de tamaño.
