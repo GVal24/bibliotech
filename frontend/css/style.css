@@ -182,27 +182,88 @@ a:hover { color: var(--accent-strong); }
     font-weight: 700;
 }
 
-/* ---------- Control de tamaño de fuente (accesibilidad) ---------- */
-.bt-fontsize-label {
-    color: var(--text-muted);
-    font-size: .85rem;
-    margin: 0 6px 0 4px;
-    vertical-align: middle;
+/* ---------- Accesibilidad: control de tamaño de fuente ---------- */
+.bt-a11y {
+    position: relative;
+    display: inline-block;
 }
-.bt-fontsize-toggle {
+/* En login/register el contenedor va anclado arriba a la izquierda:
+   conservamos el posicionamiento absoluto de W3 y solo usamos el contenedor
+   como referencia para el panel. */
+.w3-display-topleft.bt-a11y {
+    position: absolute;
+}
+.w3-display-topleft.bt-a11y .bt-a11y-panel {
+    left: 0;
+    right: auto;
+}
+.bt-a11y-btn {
     background-color: transparent !important;
     color: var(--text) !important;
     border: 1px solid var(--border) !important;
+    border-radius: 50% !important;
     cursor: pointer;
-    font-weight: 600;
+    line-height: 0;
+    padding: 8px !important;
 }
-.bt-fontsize-toggle:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
-.bt-fontsize-toggle.is-active {
+.bt-a11y-btn:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+.bt-a11y-btn.is-active {
     border-color: var(--accent) !important;
     color: var(--accent) !important;
-    background-color: var(--surface-2) !important;
-    font-weight: 700;
+    box-shadow: 0 0 0 2px var(--accent);
 }
+
+/* Panel desplegable */
+.bt-a11y-panel {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 1000;
+    min-width: 260px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.bt-a11y-panel.is-open { display: block; }
+
+.bt-a11y-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.bt-a11y-step {
+    background-color: transparent !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    font-weight: 700;
+    padding: 4px 10px !important;
+}
+.bt-a11y-step:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+
+.bt-a11y-slider {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
+    min-width: 90px;
+}
+.bt-a11y-value {
+    color: var(--text-muted);
+    font-size: .85rem;
+    min-width: 40px;
+    text-align: right;
+}
+.bt-a11y-reset {
+    margin-top: 10px;
+    width: 100%;
+    background-color: transparent !important;
+    color: var(--text-muted) !important;
+    border: 1px solid var(--border) !important;
+    font-size: .85rem;
+}
+.bt-a11y-reset:hover { color: var(--accent) !important; border-color: var(--accent) !important; }
 
 /* ---------- Landing / hero ---------- */
 .bt-hero {
