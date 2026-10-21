@@ -6,56 +6,95 @@
 */
 
 /**
- * Node.js fs (File System) es un módulo nativo integrado que permite 
- * interactuar con el sistema de archivos del sistema operativo 
- * (leer, escribir, crear, borrar directorios y archivos). 
- * Ofrece métodos síncronos y asíncronos (más eficientes para 
- * alto rendimiento) sin necesidad de instalaciones adicionales.
+ * Node.js fs (File System) es un módulo nativo integrado que permite
+ * interactuar con el sistema de archivos del sistema operativo
+ * (leer, escribir, crear, borrar directorios y archivos).
  */
 const fs = require('fs'); // para manejar el filesystem al borrar archivos
 
 /**
- * El módulo path en Node.js es una utilidad integrada que permite 
- * manejar y transformar rutas de archivos y directorios de forma 
- * segura y consistente entre diferentes sistemas operativos 
- * (Windows, Linux, macOS). Facilita la creación de rutas absolutas 
- * y relativas sin preocuparse por los separadores de barras (/ o \). 
+ * El módulo path en Node.js es una utilidad integrada que permite
+ * manejar y transformar rutas de archivos y directorios de forma
+ * segura y consistente entre diferentes sistemas operativos.
  */
 const path = require('path'); // para el manejo de rutas
 
+const { cloudinary, isConfigured } = require('../config/cloudinaryConfig');
+
 /**
- * Utilidad para gestionar archivos físicos
+ * Extrae el public_id y el resource_type de una URL de Cloudinary.
+ * Ej: https://res.cloudinary.com/demo/image/upload/v1699999/bibliotech/documents/123-x.pdf
+ *     -> { publicId: 'bibliotech/documents/123-x', resourceType: 'image' }
+ * @param {string} url
+ * @returns {{publicId: string, resourceType: string}|null}
  */
-const fileHelper = 
+function parseCloudinaryUrl(url) {
+    const match = url.match(/\/(image|video|raw)\/upload\/(?:v\d+\/)?(.+)$/);
+    if (!match) return null;
+
+    const resourceType = match[1];
+    let publicId = match[2];
+
+    // Para 'image' y 'video' Cloudinary omite la extensión en el public_id;
+    // para 'raw' la incluye.
+    if (resourceType === 'raw') {
+        return { publicId, resourceType };
+    }
+    publicId = publicId.replace(/\.[^/.]+$/, '');
+    return { publicId, resourceType };
+}
+
+/**
+ * Utilidad para gestionar archivos físicos / remotos
+ */
+const fileHelper =
 {
     /**
-     * Elimina un archivo del disco de forma segura
-     * @param {string} relativePath - Ruta guardada en la DB (ej: /uploads/documents/document.pdf)
+     * Elimina un archivo, ya sea de Cloudinary (si la ruta es una URL) o del
+     * disco local (si es una ruta relativa).
+     * @param {string} pathOrUrl - Ruta guardada en la DB (puede ser /uploads/... o https://res.cloudinary.com/...)
+     * @returns {Promise<boolean>}
      */
-    deleteFile(relativePath) 
+    async deleteFile(pathOrUrl)
     {
-        if (!relativePath) return;
+        if (!pathOrUrl) return false;
 
+        // --- Archivo en Cloudinary ---
+        if (/^https?:\/\//.test(pathOrUrl)) {
+            if (!isConfigured) {
+                console.warn(`⚠️ Cloudinary no configurado; no se borra: ${pathOrUrl}`);
+                return false;
+            }
+            const parsed = parseCloudinaryUrl(pathOrUrl);
+            if (!parsed) {
+                console.warn(`⚠️ No se pudo interpretar la URL de Cloudinary: ${pathOrUrl}`);
+                return false;
+            }
+            try {
+                await cloudinary.uploader.destroy(parsed.publicId, {
+                    resource_type: parsed.resourceType
+                });
+                console.log(`✅ Archivo eliminado de Cloudinary: ${parsed.publicId}`);
+                return true;
+            } catch (err) {
+                console.error(`❌ Error al borrar en Cloudinary: ${err.message}`);
+                return false;
+            }
+        }
+
+        // --- Archivo en disco local ---
         /**
-         * path.join maneja perfectamente la barra inicial si existe
-         * process.cwd() devuelve el directorio del proceso de Node.js
-         * usando path.join con el directorio del proceso + la ruta relativa
-         * construimos la ruta absoluta para poder borrar el archivo.
+         * path.join maneja perfectamente la barra inicial si existe.
+         * process.cwd() devuelve el directorio del proceso de Node.js.
          */
-        const absolutePath = path.join(process.cwd(), relativePath);
+        const absolutePath = path.join(process.cwd(), pathOrUrl);
 
-        try 
+        try
         {
-            /**
-             * fs.unlinkSync: Para operaciones de borrado dentro de un controlador
-             * a veces es preferible la versión síncrona para evitar problemas 
-             * de "condición de carrera" (que el código siga antes de que el 
-             * archivo se borre realmente).
-             */
             if (fs.existsSync(absolutePath))
             {
                 fs.unlinkSync(absolutePath);
-                console.log(`✅ Archivo eliminado: ${relativePath}`);
+                console.log(`✅ Archivo eliminado: ${pathOrUrl}`);
                 return true;
             }
             console.warn(`⚠️ Archivo no encontrado: ${absolutePath}`);

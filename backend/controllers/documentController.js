@@ -80,20 +80,54 @@ function contentTypeFor(filename) {
 }
 
 /**
- * Envía un documento al cliente resolviendo su ruta física en disco.
+ * Envía un documento al cliente.
+ * - Si file_path es una URL (Cloudinary):
+ *     - 'inline'     -> redirige a la URL (el navegador lo muestra embebido).
+ *     - 'attachment' -> descarga el archivo y lo reenvía con Content-Disposition
+ *       para forzar la descarga con el nombre original (Cloudinary no admite
+ *       nombres con punto en el flag fl_attachment).
+ * - Si es una ruta local, resuelve el archivo en disco y lo sirve.
  * @param {object} res - respuesta de Express.
  * @param {object} document - documento de la base.
  * @param {'inline'|'attachment'} disposition - ver online o descargar.
  */
-function sendDocumentFile(res, document, disposition) {
+async function sendDocumentFile(res, document, disposition) {
+    const filePath = document.file_path || '';
+
+    // --- Archivo alojado en la nube (Cloudinary) ---
+    if (/^https?:\/\//.test(filePath)) {
+        if (disposition !== 'attachment') {
+            return res.redirect(filePath);
+        }
+
+        // Descarga: traemos el archivo y lo reenviamos con el nombre correcto.
+        try {
+            const upstream = await fetch(filePath);
+            if (!upstream.ok) {
+                return res.status(502).json({ message: lang.t('doc.file.missing') });
+            }
+            const buffer = Buffer.from(await upstream.arrayBuffer());
+            res.setHeader('Content-Type', contentTypeFor(document.filename || filePath));
+            res.setHeader(
+                'Content-Disposition',
+                'attachment; filename="' + (document.filename || 'documento') + '"'
+            );
+            return res.send(buffer);
+        }
+        catch (error) {
+            return res.status(502).json({ message: lang.t('doc.file.missing'), error: error.message });
+        }
+    }
+
+    // --- Archivo en disco local ---
     // file_path viene como '/uploads/documents/archivo.ext' (relativo al backend)
-    const absolutePath = path.join(__dirname, '..', document.file_path.replace(/^\//, ''));
+    const absolutePath = path.join(__dirname, '..', filePath.replace(/^\//, ''));
 
     if (!fs.existsSync(absolutePath)) {
         return res.status(404).json({ message: lang.t('doc.file.missing') });
     }
 
-    res.setHeader('Content-Type', contentTypeFor(document.filename || document.file_path));
+    res.setHeader('Content-Type', contentTypeFor(document.filename || filePath));
     res.setHeader(
         'Content-Disposition',
         disposition + '; filename="' + (document.filename || 'documento') + '"'
@@ -202,7 +236,7 @@ class DocumentController
                 return res.status(404).json({ message: lang.t('doc.notFound') });
             }
 
-            sendDocumentFile(res, document, 'inline');
+            await sendDocumentFile(res, document, 'inline');
         }
         catch (error)
         {
@@ -221,7 +255,7 @@ class DocumentController
                 return res.status(404).json({ message: lang.t('doc.notFound') });
             }
 
-            sendDocumentFile(res, document, 'attachment');
+            await sendDocumentFile(res, document, 'attachment');
         }
         catch (error)
         {
@@ -246,8 +280,15 @@ class DocumentController
     // POST /api/documents/upload  (admin, professor y student)
     async uploadDocument(req, res)
     {
-        // Ruta relativa del archivo dentro de /uploads (se usa para borrarlo si falla)
-        const relativePath = req.file ? `/uploads/documents/${req.file.filename}` : null;
+        // Ruta/referencia del archivo tal como la devuelve el storage:
+        //  - Cloudinary: req.file.path = URL segura (https://res.cloudinary.com/...)
+        //  - Disco local: '/uploads/documents/archivo.ext' (relativo al backend)
+        // Se guarda en la DB y sirve para borrarlo si algo falla.
+        const storedPath = req.file
+            ? (req.file.path && /^https?:\/\//.test(req.file.path)
+                ? req.file.path
+                : `/uploads/documents/${req.file.filename}`)
+            : null;
 
         try
         {
@@ -258,7 +299,7 @@ class DocumentController
 
             if (handler.hasErrors())
             {
-                if (relativePath) fileHelper.deleteFile(relativePath);
+                if (storedPath) await fileHelper.deleteFile(storedPath);
                 return res.status(400).json({
                     message: lang.t('doc.fields.invalid'),
                     errors: handler.getErrors()
@@ -277,7 +318,7 @@ class DocumentController
             const allowed = require('../config/multerConfig').ALLOWED_EXTENSIONS;
             if (!allowed.includes(ext))
             {
-                fileHelper.deleteFile(relativePath);
+                await fileHelper.deleteFile(storedPath);
                 return res.status(400).json({ message: lang.t('file.type.only') });
             }
 
@@ -295,7 +336,7 @@ class DocumentController
                 category: category || null,
                 year: year ? parseInt(year, 10) : null,
                 description: description || null,
-                file_path: relativePath,
+                file_path: storedPath,
                 status
             });
 
@@ -310,7 +351,7 @@ class DocumentController
         catch (error)
         {
             // Si algo falló después de guardar el archivo, evitamos dejar basura en disco
-            if (relativePath) fileHelper.deleteFile(relativePath);
+            if (storedPath) await fileHelper.deleteFile(storedPath);
             res.status(500).json({ message: lang.t('doc.upload.error'), error: error.message });
         }
     }
@@ -381,8 +422,8 @@ class DocumentController
             // 1. Borrar primero la fila (si falla, no perdemos el archivo)
             await documentRepo.delete(req.params.id);
 
-            // 2. Borrar el archivo físico
-            fileHelper.deleteFile(document.file_path);
+            // 2. Borrar el archivo físico (local o en Cloudinary)
+            await fileHelper.deleteFile(document.file_path);
 
             res.json({ message: lang.t('doc.deleted') });
         }

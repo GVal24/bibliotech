@@ -17,14 +17,17 @@
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { cloudinary, isConfigured } = require('./cloudinaryConfig');
 
 // 1. Definimos la ruta absoluta al directorio de subidas de documentos
 // process.cwd() apunta a la raíz del proyecto donde se ejecutó 'node'
+// (solo se usa como respaldo local cuando Cloudinary no está configurado).
 const uploadDir = path.join(process.cwd(), 'uploads', 'documents');
 
 // 2. Comprobación y creación de directorio en tiempo de inicialización
 // Esto se ejecuta UNA SOLA VEZ cuando el servidor arranca.
-if (!fs.existsSync(uploadDir)) {
+if (!isConfigured && !fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
     console.log(`📁 Directorio creado automáticamente: ${uploadDir}`);
 }
@@ -48,17 +51,35 @@ const ALLOWED_EXTENSIONS = [
 ];
 
 /**
- * Configuración de almacenamiento de Multer
+ * Configuración de almacenamiento de Multer.
+ *
+ * - Si Cloudinary está configurado, los archivos se suben a la nube (persisten
+ *   entre reinicios). req.file.path = URL segura, req.file.filename = public_id.
+ * - Si no, se guardan en disco local como tradicionalmente.
  */
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir); // Carpeta donde se guardarán físicamente los archivos
-    },
-    filename: (req, file, cb) => {
-        // Renombramos el archivo: timestamp + nombre original para que sea único
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
+const storage = isConfigured
+    ? new CloudinaryStorage({
+        cloudinary,
+        params: {
+            folder: 'bibliotech/documents',
+            resource_type: 'auto',
+            // public_id único: timestamp + nombre original (sin extensión)
+            public_id: (req, file) => {
+                const ext = path.extname(file.originalname);
+                const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
+                return Date.now() + '-' + base;
+            }
+        }
+    })
+    : multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, uploadDir); // Carpeta donde se guardarán físicamente los archivos
+        },
+        filename: (req, file, cb) => {
+            // Renombramos el archivo: timestamp + nombre original para que sea único
+            cb(null, Date.now() + '-' + file.originalname);
+        }
+    });
 
 /**
  * Filtro de primer nivel: acepta sólo las extensiones de la lista blanca.
@@ -88,3 +109,4 @@ const upload = multer({
 // 'documentFile' es el nombre del campo en el formulario
 module.exports = upload.single('documentFile');
 module.exports.ALLOWED_EXTENSIONS = ALLOWED_EXTENSIONS;
+module.exports.usingCloudinary = isConfigured;

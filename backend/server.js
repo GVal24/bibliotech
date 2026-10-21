@@ -13,10 +13,11 @@
  * y credenciales sensibles (claves API, credenciales de bases de datos, 
  * tokens) fuera del código fuente. Se sitúa en la raíz del proyecto, 
  * usa pares clave-valor y nunca debe subirse al control de versiones (Git). 
- * Se usa 'override: true' para que el .env del proyecto tenga prioridad sobre
- * variables de entorno del sistema que puedan colisionar (ej: DB_NAME).
+ * Se usa 'override: true' SOLO en desarrollo para que el .env del proyecto
+ * tenga prioridad sobre variables de entorno del sistema que puedan colisionar
+ * (ej: DB_NAME). En producción se respetan las variables del host (Render, etc.).
  */
- require('dotenv').config({ override: true });
+ require('dotenv').config({ override: process.env.NODE_ENV !== 'production' });
 
 /**
  * Express es un framework web minimalista, rápido y flexible para Node.js, 
