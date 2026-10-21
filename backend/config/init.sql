@@ -40,6 +40,10 @@ CREATE TABLE users_roles (
 );
 
 -- 6. Tabla de Documentos
+--    status: máquina de estados del flujo de aprobación (patrón State)
+--      pending  -> subido por un Student, espera revisión de Professor/Admin
+--      approved -> visible en el catálogo público
+--      rejected -> rechazado por Professor/Admin, no se comparte
 CREATE TABLE documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -48,21 +52,28 @@ CREATE TABLE documents (
     category VARCHAR(100),
     year INT NULL, description TEXT NULL, isbn VARCHAR(20) NULL, author VARCHAR(150) NULL,
     file_path VARCHAR(255) NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 7. Inserción de Datos Maestros (Roles)
-INSERT INTO roles (name) VALUES ('admin'), ('client');
+-- 7. InserciA3n de Datos Maestros (Roles)
+--    Roles del sistema: admin (rompe todo), professor (publica y aprueba),
+--    student (consulta y propone material que debe aprobarse).
+INSERT INTO roles (name) VALUES ('admin'), ('professor'), ('student');
 
--- 8. Datos de prueba iniciales
--- Usuario 'admin' (pass: 12345)
+-- 8. Datos de prueba iniciales (pass: 12345 para todos)
+-- Usuario 'admin' -> Rol Admin
 INSERT INTO users (id, username, password) VALUES (1, 'admin', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS');
-INSERT INTO users_roles (user_id, role_id) VALUES (1, 1); -- Rol Admin
+INSERT INTO users_roles (user_id, role_id) VALUES (1, 1);
 
--- Usuario 'pepe' (pass: 12345)
-INSERT INTO users (id, username, password) VALUES (2, 'pepe', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS');
-INSERT INTO users_roles (user_id, role_id) VALUES (2, 2); -- Rol Client
+-- Usuario 'profe' -> Rol Professor
+INSERT INTO users (id, username, password) VALUES (2, 'profe', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS');
+INSERT INTO users_roles (user_id, role_id) VALUES (2, 2);
+
+-- Usuario 'pepe' -> Rol Student
+INSERT INTO users (id, username, password) VALUES (3, 'pepe', '$2b$10$.n0s847tiSxBqDvIo6Vg5ujXC5zIUmm98bTjBWnRdqX9CxxbIo7wS');
+INSERT INTO users_roles (user_id, role_id) VALUES (3, 3);
 
 -- ==========================================================
 -- 9. PROCEDIMIENTOS ALMACENADOS (Stored Procedures)
@@ -116,38 +127,116 @@ BEGIN
     DELETE FROM users WHERE id = p_id;
 END //
 
--- --- PROCEDIMIENTOS PARA DOCUMENTOS ---
-
--- Crear Sample
-CREATE PROCEDURE sp_create_document(
-    IN p_user_id INT,
-    IN p_filename VARCHAR(255),
-    IN p_title VARCHAR(200), IN p_author VARCHAR(150), IN p_isbn VARCHAR(20),
-    IN p_category VARCHAR(100), IN p_year INT, IN p_description TEXT,
-    IN p_file_path VARCHAR(255)
-)
+-- Cambiar el rol de un usuario (el Admin asigna Professor, por ejemplo).
+-- Reemplaza TODOS los roles del usuario por el nuevo.
+CREATE PROCEDURE sp_update_user_role(IN p_user_id INT, IN p_role_name VARCHAR(20))
 BEGIN
-    INSERT INTO documents (user_id, filename, title, author, isbn, category, year, description, file_path)
-    VALUES (p_user_id, p_filename, p_title, p_author, p_isbn, p_category, p_year, p_description, p_file_path);
-    SELECT LAST_INSERT_ID() as insertId;
+    DECLARE v_role_id INT;
+
+    SELECT id INTO v_role_id FROM roles WHERE name = p_role_name;
+
+    -- Si el rol no existe, no hacemos nada (evita dejar al usuario sin rol)
+    IF v_role_id IS NOT NULL THEN
+        DELETE FROM users_roles WHERE user_id = p_user_id;
+        INSERT INTO users_roles (user_id, role_id) VALUES (p_user_id, v_role_id);
+    END IF;
 END //
 
--- Listar documents por usuario
+-- --- PROCEDIMIENTOS PARA DOCUMENTOS (catálogo compartido de la biblioteca) ---
+
+-- Listar todo el catálogo PÚBLICO (solo documentos aprobados)
+CREATE PROCEDURE sp_find_all_documents()
+BEGIN
+    SELECT d.id, d.title, d.author, d.isbn, d.category, d.year, d.description,
+           d.filename, d.file_path, d.status, d.created_at, u.username AS uploaded_by
+    FROM documents d
+    JOIN users u ON d.user_id = u.id
+    WHERE d.status = 'approved'
+    ORDER BY d.created_at DESC;
+END //
+
+-- Buscar documentos aprobados por título, autor, ISBN o categoría
+CREATE PROCEDURE sp_search_documents(IN p_term VARCHAR(200))
+BEGIN
+    SELECT d.id, d.title, d.author, d.isbn, d.category, d.year, d.description,
+           d.filename, d.file_path, d.status, d.created_at, u.username AS uploaded_by
+    FROM documents d
+    JOIN users u ON d.user_id = u.id
+    WHERE d.status = 'approved'
+      AND (d.title LIKE CONCAT('%', p_term, '%')
+        OR d.author LIKE CONCAT('%', p_term, '%')
+        OR d.isbn LIKE CONCAT('%', p_term, '%')
+        OR d.category LIKE CONCAT('%', p_term, '%'))
+    ORDER BY d.created_at DESC;
+END //
+
+-- Listar los documentos subidos por un usuario (usado al dar de baja un administrador)
 CREATE PROCEDURE sp_find_documents_by_user(IN p_user_id INT)
 BEGIN
     SELECT * FROM documents WHERE user_id = p_user_id;
 END //
 
--- Buscar sample específico (Validando dueño)
-CREATE PROCEDURE sp_find_document_by_id(IN p_id INT, IN p_user_id INT)
+-- Listar documentos por estado (usado por Professor/Admin para la cola de aprobación)
+CREATE PROCEDURE sp_find_documents_by_status(IN p_status VARCHAR(20))
 BEGIN
-    SELECT * FROM documents WHERE id = p_id AND user_id = p_user_id;
+    SELECT d.id, d.title, d.author, d.isbn, d.category, d.year, d.description,
+           d.filename, d.file_path, d.status, d.created_at, u.username AS uploaded_by
+    FROM documents d
+    JOIN users u ON d.user_id = u.id
+    WHERE d.status = p_status
+    ORDER BY d.created_at DESC;
 END //
 
--- Borrar sample (Validando dueño)
-CREATE PROCEDURE sp_delete_document(IN p_id INT, IN p_user_id INT)
+-- Obtener un documento por su id
+CREATE PROCEDURE sp_find_document_by_id(IN p_id INT)
 BEGIN
-    DELETE FROM documents WHERE id = p_id AND user_id = p_user_id;
+    SELECT d.id, d.title, d.author, d.isbn, d.category, d.year, d.description,
+           d.filename, d.file_path, d.status, d.created_at, u.username AS uploaded_by
+    FROM documents d
+    JOIN users u ON d.user_id = u.id
+    WHERE d.id = p_id;
+END //
+
+-- Agregar un documento a la biblioteca.
+-- El estado inicial lo decide el controlador según el rol (State):
+--   professor/admin -> 'approved' (publica directo)
+--   student         -> 'pending'  (requiere aprobación)
+CREATE PROCEDURE sp_create_document(
+    IN p_user_id INT,
+    IN p_filename VARCHAR(255),
+    IN p_title VARCHAR(200), IN p_author VARCHAR(150), IN p_isbn VARCHAR(20),
+    IN p_category VARCHAR(100), IN p_year INT, IN p_description TEXT,
+    IN p_file_path VARCHAR(255), IN p_status VARCHAR(20)
+)
+BEGIN
+    INSERT INTO documents (user_id, filename, title, author, isbn, category, year, description, file_path, status)
+    VALUES (p_user_id, p_filename, p_title, p_author, p_isbn, p_category, p_year, p_description, p_file_path, p_status);
+    SELECT LAST_INSERT_ID() as insertId;
+END //
+
+-- Cambiar el estado de un documento (aprobar / rechazar). Solo Professor/Admin.
+CREATE PROCEDURE sp_set_document_status(IN p_id INT, IN p_status VARCHAR(20))
+BEGIN
+    UPDATE documents SET status = p_status WHERE id = p_id;
+END //
+
+-- Actualizar los metadatos de un documento (solo administrador)
+CREATE PROCEDURE sp_update_document(
+    IN p_id INT,
+    IN p_title VARCHAR(200), IN p_author VARCHAR(150), IN p_isbn VARCHAR(20),
+    IN p_category VARCHAR(100), IN p_year INT, IN p_description TEXT
+)
+BEGIN
+    UPDATE documents
+    SET title = p_title, author = p_author, isbn = p_isbn,
+        category = p_category, year = p_year, description = p_description
+    WHERE id = p_id;
+END //
+
+-- Borrar un documento de la biblioteca (solo administrador)
+CREATE PROCEDURE sp_delete_document(IN p_id INT)
+BEGIN
+    DELETE FROM documents WHERE id = p_id;
 END //
 
 DELIMITER ;

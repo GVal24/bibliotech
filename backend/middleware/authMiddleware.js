@@ -1,5 +1,5 @@
 /**
-*    Project     : Sample Vault
+*    Project     : Bibliotech
 *    Author      : Tecnologías Informáticas B - Facultad de Ingeniería - UNMdP
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Marzo 2026
@@ -15,6 +15,18 @@
 const jwt = require('jsonwebtoken');
 // En producción, siempre usar variables de entorno (.env):
 const SECRET_KEY = process.env.JWT_SECRET;
+
+/**
+ * Extrae los roles del request y verifica si alguno de los esperados está presente.
+ * Acepta rol como string ("admin") o como array (["student", "professor"]).
+ * @param {string|string[]} currentRoles - roles que trae el token.
+ * @param {string[]} allowedRoles - roles que autorizan el acceso.
+ * @returns {boolean}
+ */
+function matchRole(currentRoles, allowedRoles) {
+    const current = Array.isArray(currentRoles) ? currentRoles : [currentRoles];
+    return current.some((role) => allowedRoles.includes(role));
+}
 
 const authMiddleware = {
     // 0. Agregar SECRET_KEY para que sea accesible al importar el objeto authMiddleware
@@ -45,24 +57,49 @@ const authMiddleware = {
         });
     },
 
-    // 2. Verifica si el usuario tiene privilegios de Admin
-    // Importante: Este middleware debe ir DESPUÉS de verifyToken en las rutas
-    isAdmin: (req, res, next) => {
-        const roles = req.userRole; // Esto puede ser un string "admin" o un array ["producer", "admin"]
-
-        // Verificamos si el rol 'admin' está presente de forma flexible
-        const hasAdminRole = Array.isArray(roles) 
-            ? roles.includes('admin') 
-            : roles === 'admin';
-
-        if (!hasAdminRole) {
-            return res.status(403).json({ 
-                message: "Acceso denegado: Se requiere privilegios de administrador." 
-            });
+    /**
+     * 2. Autorización genérica y reutilizable (Open/Closed Principle).
+     * Fábrica de middleware: se le pasan los roles permitidos y devuelve
+     * un middleware de Express. Agregar roles nuevos NO obliga a modificar
+     * este archivo.
+     *
+     * Importante: debe ir DESPUÉS de verifyToken en las rutas.
+     * @param {...string} allowedRoles - roles autorizados (ej: 'admin', 'professor').
+     */
+    hasRole: (...allowedRoles) => (req, res, next) => {
+        if (matchRole(req.userRole, allowedRoles)) {
+            return next();
         }
-        
-        next();
-    }    
+        return res.status(403).json({
+            message: "Acceso denegado: se requieren privilegios de " + allowedRoles.join(' o ') + "."
+        });
+    },
+
+    /**
+     * 3. Verifica el token viniendo por query string (?token=...).
+     *    Necesario para recursos que el navegador pide directamente sin poder
+     *    enviar el header Authorization: <embed>, <img>, <a download>, etc.
+     *    Debe usarse SOLO para endpoints de archivos, nunca para la API general.
+     */
+    verifyTokenFromQuery: (req, res, next) => {
+        const pureToken = req.query.token;
+
+        if (!pureToken) {
+            return res.status(403).json({ message: "Token inexistente." });
+        }
+
+        jwt.verify(pureToken, SECRET_KEY, (err, decoded) => {
+            if (err) return res.status(401).json({ message: "Token inválido o expirado." });
+
+            req.userId = decoded.id;
+            req.userRole = decoded.role;
+            next();
+        });
+    },
+
+    // 4. Alias de compatibilidad hacia atrás: solo Admin.
+    //    Es un caso particular de hasRole, así las rutas existentes no cambian.
+    isAdmin: (req, res, next) => authMiddleware.hasRole('admin')(req, res, next)
 };
 
 module.exports = authMiddleware;

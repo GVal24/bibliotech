@@ -1,5 +1,5 @@
 /**
-*    Project     : Sample Vault
+*    Project     : Bibliotech
 *    Author      : Tecnologías Informáticas B - Facultad de Ingeniería - UNMdP
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Marzo 2026
@@ -27,9 +27,13 @@ if (loginForm)
             {
                 window.location.href = '/admin-dashboard';
             }
+            else if (data.role === 'professor')
+            {
+                window.location.href = '/professor-dashboard';
+            }
             else
             {
-                window.location.href = '/producer-dashboard';
+                window.location.href = '/client-dashboard';
             }
 
         }

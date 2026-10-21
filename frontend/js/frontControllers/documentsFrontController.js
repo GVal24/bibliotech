@@ -1,88 +1,187 @@
 /**
 *    Project     : Bibliotech
-*    Author      : TecnologA-as InformA?ticas B - Facultad de IngenierA-a - UNMdP
+*    Author      : Tecnologías Informáticas B - Facultad de Ingeniería - UNMdP
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Marzo 2026
 */
 
-document.addEventListener('DOMContentLoaded', loadDocuments);
+/**
+ * Catálogo público de la biblioteca.
+ *  - Sin sesión: solo lectura online del material aprobado (sin descargar).
+ *  - Sesión: además puede descargar y proponer material (queda pendiente).
+ */
 
-async function loadDocuments() {
+document.addEventListener('DOMContentLoaded', initCatalog);
+
+function initCatalog() {
+    initSessionUI();
+    initContributorForm();
+
+    const searchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => loadDocuments(searchInput.value));
+    }
+    if (searchInput) {
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadDocuments(searchInput.value);
+        });
+    }
+
+    loadDocuments('');
+}
+
+// Adapta la barra superior y el formulario de aportes según haya sesión o no
+function initSessionUI() {
+    const token = authHelper.getToken();
+    const loginLink = document.getElementById('loginLink');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (token) {
+        if (loginLink) loginLink.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+
+        // Un Student logueado puede subir material
+        const contributorCard = document.getElementById('contributorCard');
+        if (contributorCard) contributorCard.style.display = 'block';
+    }
+}
+
+// Pide el catálogo completo o filtrado por término
+async function loadDocuments(term = '') {
     try {
-        const documents = await apiService.request('/documents/my-documents', 'GET');
+        const clean = (term || '').trim();
+        const query = clean ? `?q=${encodeURIComponent(clean)}` : '';
+        const documents = await apiService.request(`/documents${query}`, 'GET');
         renderDocumentsTable(documents);
     } catch (error) {
-        showModal('Error', 'No se pudieron cargar los documentos: ' + error.message);
+        showModal('Error', 'No se pudo cargar el catálogo: ' + error.message);
     }
 }
 
 function renderDocumentsTable(documents) {
     const tbody = document.getElementById('documentsTableBody');
     tbody.replaceChildren();
-    documents.forEach(d => {
+
+    if (!documents.length) {
         const row = document.createElement('tr');
-        const tdName = document.createElement('td');
-        tdName.textContent = d.display_name;
-        const tdCat = document.createElement('td');
-        const spanCat = document.createElement('span');
-        spanCat.className = 'w3-tag w3-round w3-black';
-        spanCat.textContent = d.category;
-        tdCat.appendChild(spanCat);
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.textContent = 'No se encontraron documentos.';
+        row.appendChild(td);
+        tbody.appendChild(row);
+        return;
+    }
+
+    documents.forEach((doc) => {
+        const row = document.createElement('tr');
+
+        const tdTitle = document.createElement('td');
+        tdTitle.textContent = doc.title;
+
+        const tdAuthor = document.createElement('td');
+        tdAuthor.textContent = doc.author;
+
+        const tdCategory = document.createElement('td');
+        const spanCategory = document.createElement('span');
+        spanCategory.className = 'w3-tag w3-round w3-black';
+        spanCategory.textContent = doc.category || 'Sin categoría';
+        tdCategory.appendChild(spanCategory);
+
         const tdYear = document.createElement('td');
-        tdYear.textContent = d.bpm || '';
-        const tdDoc = document.createElement('td');
-        const embed = document.createElement('embed');
-        embed.src = http://localhost:3000;
-        embed.type = 'application/pdf';
-        embed.width = '100%';
-        embed.height = '300px';
-        embed.style = 'border: none;';
-        tdDoc.appendChild(embed);
+        tdYear.textContent = doc.year != null ? doc.year : '';
+
         const tdActions = document.createElement('td');
-        const btnDelete = document.createElement('button');
-        btnDelete.className = 'w3-button w3-red w3-tiny w3-round';
-        btnDelete.textContent = 'Borrar';
-        btnDelete.addEventListener('click', () => deleteDocument(d.id));
-        const btnDownload = document.createElement('a');
+
+        const btnRead = document.createElement('button');
+        btnRead.className = 'w3-button w3-yellow w3-tiny w3-round';
+        btnRead.textContent = 'Leer';
+        btnRead.addEventListener('click', () => openViewer(doc));
+
+        tdActions.append(btnRead);
+
+        // Descargar: solo usuarios registrados. El invitado ve el botón pero
+        // al pulsarlo se le invita a ingresar.
+        const btnDownload = document.createElement('button');
         btnDownload.className = 'w3-button w3-blue w3-tiny w3-round w3-margin-left';
         btnDownload.textContent = 'Descargar';
-        btnDownload.href = http://localhost:3000;
-        btnDownload.download = d.filename;
-        btnDownload.target = '_blank';
-        tdActions.appendChild(btnDelete);
-        tdActions.appendChild(btnDownload);
-        row.append(tdName, tdCat, tdYear, tdDoc, tdActions);
+        btnDownload.addEventListener('click', () => requestDownload(doc));
+
+        tdActions.append(btnDownload);
+
+        row.append(tdTitle, tdAuthor, tdCategory, tdYear, tdActions);
         tbody.appendChild(row);
     });
 }
 
-async function deleteDocument(id) {
-    if (!confirm('�Est�s seguro de eliminar este documento?')) return;
-    try {
-        await apiService.request(/documents/, 'DELETE');
-        showModal('Eliminado', 'El documento ha sido borrado.');
-        loadDocuments();
-    } catch (error) {
-        showModal('Error', error.message);
-    }
-}
+/* --------------------- Aporte de material (Student) --------------------- */
+function initContributorForm() {
+    const form = document.getElementById('contributorForm');
+    if (!form) return;
 
-const uploadForm = document.getElementById('uploadForm');
-if (uploadForm) {
-    uploadForm.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        const fileInput = document.getElementById('contribFile');
+        if (!fileInput.files.length) {
+            return showModal('Falta el archivo', 'Debes seleccionar un archivo.');
+        }
+
         const formData = new FormData();
-        formData.append('display_name', document.getElementById('display_name').value);
-        formData.append('category', document.getElementById('category').value);
-        formData.append('bpm', document.getElementById('bpm').value);
-        formData.append('documentFile', document.getElementById('documentFile').files[0]);
+        formData.append('title', document.getElementById('contribTitle').value.trim());
+        formData.append('author', document.getElementById('contribAuthor').value.trim());
+        formData.append('isbn', document.getElementById('contribIsbn').value.trim());
+        formData.append('category', document.getElementById('contribCategory').value);
+        formData.append('year', document.getElementById('contribYear').value);
+        formData.append('description', document.getElementById('contribDescription').value.trim());
+        formData.append('documentFile', fileInput.files[0]);
+
         try {
-            await apiService.request('/documents/upload', 'POST', formData, true);
-            showModal('�xito', 'Documento guardado.');
-            uploadForm.reset();
-            loadDocuments();
+            const result = await apiService.request('/documents/upload', 'POST', formData, true);
+            showModal('Enviado', result.message || 'Material enviado para revisión.');
+            form.reset();
         } catch (error) {
-            showModal('Error al subir', error.message);
+            showModal('Error', error.message);
         }
     });
+}
+
+// Muestra el documento incrustado en la misma página para lectura online
+function openViewer(doc) {
+    const card = document.getElementById('viewerCard');
+    if (!card) return;
+
+    document.getElementById('viewerTitle').textContent = doc.title;
+
+    const embed = document.getElementById('pdfViewer');
+    // Endpoint público de lectura (inline). No requiere token.
+    embed.src = `/api/documents/${doc.id}/file`;
+
+    const downloadBtn = document.getElementById('viewerDownload');
+    if (downloadBtn) {
+        downloadBtn.onclick = () => requestDownload(doc);
+    }
+
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Descarga el documento. Solo usuarios registrados: si no hay sesión,
+// se invita a ingresar. El token viaja por query porque <embed>/<a> no
+// pueden enviar el header Authorization.
+function requestDownload(doc) {
+    const token = authHelper.getToken();
+
+    if (!token) {
+        showModal('Ingresá para descargar', 'Necesitás una cuenta para descargar el material. Podés seguir leyéndolo online.');
+        return;
+    }
+
+    const a = document.createElement('a');
+    a.href = `/api/documents/${doc.id}/download?token=${encodeURIComponent(token)}`;
+    a.download = doc.filename || '';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 }

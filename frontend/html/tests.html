@@ -5,9 +5,18 @@
     <title>Bibliotech - Test Suite API</title>
     <link rel="stylesheet" href="../css/w3.css">
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="icon" type="image/png" href="../img/favicon-gold.png">
+    <link rel="icon" type="image/png" href="../img/favicon.png">
+    <script src="../js/utils/themeSwitcher.js"></script>
 </head>
-<body class="w3-dark-grey">
+<body>
+
+    <div class="w3-bar bt-nav">
+        <span class="w3-bar-item bt-brand">
+            <img src="../img/logo.png" alt="Bibliotech" class="bt-logo"><b>BIBLIOTECH</b>
+        </span>
+        <span class="w3-bar-item bt-subtitle">Laboratorio de Pruebas API</span>
+        <span class="w3-bar-item w3-right" data-theme-toggle></span>
+    </div>
 
     <div class="w3-container w3-padding-32">
         <h1 class="w3-text-yellow"><b>Laboratorio de Pruebas API</b></h1>
@@ -20,7 +29,7 @@
 
             <div class="w3-col l6 m12 s12">
                 <h3 class="w3-text-white">Resultado de la API</h3>
-                <div id="api-console" class="w3-code w3-black w3-border-yellow w3-border w3-padding" style="min-height: 400px; overflow-y: auto;">
+                <div id="api-console" class="w3-code vault-card w3-border w3-padding" style="min-height: 400px; overflow-y: auto;">
                     Esperando ejecución...
                 </div>
             </div>
@@ -29,7 +38,7 @@
 
     <script src="../js/tests/testUtils.js"></script>
     <script src="../js/tests/authTests.js"></script>
-    <script src="../js/tests/sampleTests.js"></script>
+    <script src="../js/tests/documentTests.js"></script>
     <script src="../js/tests/adminTests.js"></script>
 </body>
 </html>

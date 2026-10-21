@@ -1,5 +1,5 @@
 /**
-*    Project     : Sample Vault
+*    Project     : Bibliotech
 *    Author      : Tecnologías Informáticas B - Facultad de Ingeniería - UNMdP
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Marzo 2026
@@ -8,6 +8,47 @@
 const bcrypt = require('bcrypt'); // Biblioteca para encriptar contraseñas
 const jwt = require('jsonwebtoken'); // Para generar tokens de sesión
 const userRepo = require('../repositories/userRepo'); // Importamos el repositorio de usuarios
+const lang = require('../utils/lang/LanguageManager');
+const {
+    ValidationHandler,
+    FieldValidator,
+    required,
+    usernameFormat,
+    strongPassword
+} = require('../utils/validation');
+
+/**
+ * Valida de forma modular que usuario y contraseña estén presentes (login).
+ * @returns {ValidationHandler} el handler con el resultado de la validación.
+ */
+function validateCredentials(username, password) {
+    const handler = new ValidationHandler()
+        .with(new FieldValidator('username', username, [required(lang.t('field.required'))]))
+        .with(new FieldValidator('password', password, [required(lang.t('field.required'))]));
+
+    handler.validate();
+    return handler;
+}
+
+/**
+ * Valida el alta de usuario aplicando filtros de formato (registro).
+ * Username: alfanumérico acotado. Password: fortaleza mínima.
+ * @returns {ValidationHandler}
+ */
+function validateRegistration(username, password) {
+    const handler = new ValidationHandler()
+        .with(new FieldValidator('username', username, [
+            required(lang.t('field.required')),
+            usernameFormat()
+        ]))
+        .with(new FieldValidator('password', password, [
+            required(lang.t('field.required')),
+            strongPassword()
+        ]));
+
+    handler.validate();
+    return handler;
+}
 
 /**
  * Deserialización moderna: "Del objeto que devuelve este require, buscá la propiedad que se 
@@ -24,18 +65,23 @@ class AuthController
         {
             const { username, password } = req.body;
 
-            // 1. Validación de presencia
-            if (!username || !password) {
-                return res.status(400).json({ message: "Usuario y contraseña son requeridos." });
+            // 1. Validación modular de presencia + formato
+            const handler = validateRegistration(username, password);
+            if (handler.hasErrors()) {
+                return res.status(400).json({
+                    message: lang.t('auth.credentials.required'),
+                    errors: handler.getErrors()
+                });
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);            
             
             // 2. Creación mediante el repositorio (que usa el SP sp_create_user)
-            const userId = await userRepo.create(username, hashedPassword, 'client');
+            //    Todo registro nuevo entra como 'student'.
+            const userId = await userRepo.create(username, hashedPassword, 'student');
             
             res.status(201).json({ 
-                message: "Usuario registrado con éxito.", 
+                message: lang.t('auth.register.success'), 
                 userId 
             });
         }
@@ -43,11 +89,11 @@ class AuthController
         {
             // 3. Manejo de error específico: Usuario Duplicado (Código ER_DUP_ENTRY en MySQL)
             if (error.code === 'ER_DUP_ENTRY') {
-                return res.status(409).json({ message: "El nombre de usuario ya existe." });
+                return res.status(409).json({ message: lang.t('auth.user.exists') });
             }
 
             res.status(500).json({ 
-                message: "Error interno durante el registro.", 
+                message: lang.t('auth.register.error'), 
                 error: error.message 
             });
         }
@@ -60,8 +106,10 @@ class AuthController
         {
             const { username, password } = req.body;
 
-            if (!username || !password) {
-                return res.status(400).json({ message: "Credenciales incompletas." });
+            // Validación modular de presencia
+            const handler = validateCredentials(username, password);
+            if (handler.hasErrors()) {
+                return res.status(400).json({ message: lang.t('auth.credentials.incomplete') });
             }
 
             // El repositorio ahora devuelve el usuario con su ROL gracias al JOIN en el SP
@@ -69,21 +117,21 @@ class AuthController
 
             if (!user || !(await bcrypt.compare(password, user.password)))
             {
-                return res.status(401).json({ message: "Credenciales inválidas." });
+                return res.status(401).json({ message: lang.t('auth.login.invalid') });
             }
 
             // 4. Generación del Token (Payload consistente con el Middleware)
             const token = jwt.sign(
                 { 
                     id: user.id, 
-                    role: user.role // Este string 'admin' o 'client' viene de la tabla roles
+                    role: user.role // Este string 'admin'/'professor'/'student' viene de la tabla roles
                 }, 
                 SECRET_KEY, 
                 { expiresIn: '2h' }
             );
 
             res.json({ 
-                message: "Login exitoso.", 
+                message: lang.t('auth.login.success'), 
                 token, 
                 role: user.role 
             });
@@ -91,7 +139,7 @@ class AuthController
         catch (error)
         {
             res.status(500).json({ 
-                message: "Error en el proceso de autenticación.", 
+                message: lang.t('auth.login.error'), 
                 error: error.message 
             });
         }

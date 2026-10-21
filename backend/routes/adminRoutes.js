@@ -1,5 +1,5 @@
 /**
-*    Project     : document Vault
+*    Project     : Bibliotech
 *    Author      : Tecnologías Informáticas B - Facultad de Ingeniería - UNMdP
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Marzo 2026
@@ -20,6 +20,7 @@ const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 router.use(verifyToken, isAdmin);
 
 router.get('/users', adminController.getAllUsers);
+router.put('/users/:id/role', adminController.updateUserRole);
 router.delete('/users/:id', adminController.deleteUser);
 
 module.exports = router;

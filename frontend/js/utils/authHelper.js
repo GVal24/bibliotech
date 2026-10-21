@@ -1,6 +1,6 @@
 /**
-*    Project     : Sample Vault
-*    Author      : Tecnologías Informáticas B - Facultad de Ingeniería - UNMdP
+*    Project     : Bibliotech
+*    Author      : TECAS(2do año) - ISFT N°151 - MdP
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Marzo 2026
 */
@@ -12,7 +12,6 @@
  const authHelper = {
     /**
      * Se puede cambiar 'localStorage' por 'sessionStorage' aquí y afectará a toda la app
-     * Cambiar a sessionStorage si se prefiere mayor seguridad en equipos compartidos
      */    
     storage: localStorage,
 
@@ -30,12 +29,28 @@
         window.location.href = '/login';
     },
 
-    // Buscamos botones de logout por clase para evitar onclick en HTML
+    
     initLogoutButtons() {
         const logoutBtns = document.querySelectorAll('.btn-logout');
         logoutBtns.forEach(btn => {
             btn.addEventListener('click', () => this.logout());
         });
+    },
+
+    /**
+     * URL pública para ver un documento online (sin descargar).
+     */
+    viewUrl(id) {
+        return `/api/documents/${id}/file`;
+    },
+
+    /**
+     * URL de descarga para usuarios registrados. El token viaja por query
+     * porque <a>/<embed> no pueden enviar el header Authorization.
+     */
+    downloadUrl(id) {
+        const token = this.getToken();
+        return `/api/documents/${id}/download?token=${encodeURIComponent(token || '')}`;
     }
 };
 

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Bibliotech - Panel del Profesor</title>
+    <link rel="stylesheet" href="../css/w3.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" type="image/png" href="../img/favicon.png">
+    <script src="../js/utils/themeSwitcher.js"></script>
+</head>
+<body>
+
+<div class="w3-bar bt-nav">
+    <span class="w3-bar-item bt-brand">
+        <img src="../img/logo.png" alt="Bibliotech" class="bt-logo"><b>BIBLIOTECH - PANEL DEL PROFESOR</b>
+    </span>
+    <span class="w3-bar-item w3-right" data-theme-toggle></span>
+    <button class="w3-bar-item w3-button w3-right btn-logout">Salir</button>
+</div>
+
+<div class="w3-container w3-padding-32">
+
+    <div class="w3-bar bt-tabs w3-round w3-margin-bottom">
+        <button class="w3-bar-item w3-button tab-btn is-active" id="tabApprovalsBtn">Aprobaciones</button>
+        <button class="w3-bar-item w3-button tab-btn" id="tabCatalogBtn">Catálogo</button>
+    </div>
+
+    <!-- ======================= APROBACIONES ======================= -->
+    <section id="sectionApprovals">
+        <h2 class="w3-text-white">Material pendiente de revisión</h2>
+        <p>Aprueba para publicar en la app o rechaza para descartar.</p>
+
+        <div class="w3-responsive">
+            <table class="w3-table w3-striped w3-bordered vault-card">
+                <thead>
+                    <tr class="bt-thead">
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Subido por</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingTableBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ======================= CATÁLOGO / SUBIDA ======================= -->
+    <section id="sectionCatalog" style="display:none;">
+        <div class="w3-card-4 vault-card w3-padding w3-round w3-margin-bottom">
+            <h3 class="w3-text-yellow">Publicar material</h3>
+            <p class="w3-small">Como profesor, tu material se publica directamente.</p>
+            <form id="professorDocForm">
+                <div class="w3-row-padding">
+                    <div class="w3-col l6 m12 s12">
+                        <label>Título *</label>
+                        <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="docTitle" required>
+                    </div>
+                    <div class="w3-col l6 m12 s12">
+                        <label>Autor *</label>
+                        <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="docAuthor" required>
+                    </div>
+                </div>
+                <div class="w3-row-padding w3-margin-top">
+                    <div class="w3-col l4 m12 s12">
+                        <label>ISBN</label>
+                        <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="docIsbn">
+                    </div>
+                    <div class="w3-col l4 m12 s12">
+                        <label>Categoría</label>
+                        <select class="w3-select w3-border w3-round vault-card w3-text-white" id="docCategory">
+                            <option value="Apunte">Apunte</option>
+                            <option value="Técnico">Técnico</option>
+                            <option value="Ensayo">Ensayo</option>
+                            <option value="Historia">Historia</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="w3-col l4 m12 s12">
+                        <label>Año</label>
+                        <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="number" id="docYear">
+                    </div>
+                </div>
+                <div class="w3-margin-top">
+                    <label>Descripción</label>
+                    <textarea class="w3-input w3-border w3-round w3-transparent w3-text-white" id="docDescription" rows="2"></textarea>
+                </div>
+                <div class="w3-margin-top">
+                    <label>Archivo *</label>
+                    <input class="w3-input w3-border w3-round" type="file" id="documentFile"
+                           accept=".pdf,.epub,.doc,.docx,.odt,.rtf,.txt,.md,.djvu,.mobi,.azw3,.ppt,.pptx,.xls,.xlsx,.csv,.ods,.odp,.jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff,.svg,.mp3,.wav,.ogg,.m4a,.flac,.mp4,.webm,.ogv,.mov">
+                    <p class="w3-small">Formatos: documentos, libros, planillas, presentaciones, imágenes y media.</p>
+                </div>
+                <button type="submit" class="w3-button w3-yellow w3-round-large w3-margin-top"><b>PUBLICAR</b></button>
+            </form>
+        </div>
+
+        <div class="w3-responsive">
+            <table class="w3-table w3-striped w3-bordered vault-card">
+                <thead>
+                    <tr class="bt-thead">
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Categoría</th>
+                        <th>Año</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="documentsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+<script src="../js/services/apiService.js"></script>
+<script src="../js/utils/authHelper.js"></script>
+<script src="../js/components/uiHandlers.js"></script>
+<script src="../js/frontControllers/professorFrontController.js"></script>
+</body>
+</html>

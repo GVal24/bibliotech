@@ -2,37 +2,152 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Bibliotech - Admin Panel</title>
+    <title>Bibliotech - Panel de Administración</title>
     <link rel="stylesheet" href="../css/w3.css">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="icon" type="image/png" href="../img/favicon.png">
+    <script src="../js/utils/themeSwitcher.js"></script>
 </head>
 <body>
 
-<div class="w3-bar w3-yellow w3-card">
-    <span class="w3-bar-item"><b>CONTROL DE ADMINISTRACIÓN</b></span>
+<div class="w3-bar bt-nav">
+    <span class="w3-bar-item bt-brand">
+        <img src="../img/logo.png" alt="Bibliotech" class="bt-logo"><b>BIBLIOTECH - PANEL DE ADMINISTRACIÓN</b>
+    </span>
+    <span class="w3-bar-item w3-right" data-theme-toggle></span>
     <button class="w3-bar-item w3-button w3-right btn-logout">Salir</button>
 </div>
 
 <div class="w3-container w3-padding-32">
-    <h2 class="w3-text-white">Panel de Productores</h2>
-    <p>Visualización global de la base de datos.</p>
 
-    <div class="w3-responsive">
-        <table class="w3-table w3-striped w3-bordered vault-card">
-            <thead>
-                <tr class="w3-dark-grey">
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Rol</th>
-                    <th>Fecha Registro</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="usersTableBody">
-            </tbody>
-        </table>
+    <div class="w3-bar bt-tabs w3-round w3-margin-bottom">
+        <button class="w3-bar-item w3-button tab-btn is-active" id="tabDocsBtn">Documentos</button>
+        <button class="w3-bar-item w3-button tab-btn" id="tabApprovalsBtn">Aprobaciones</button>
+        <button class="w3-bar-item w3-button tab-btn" id="tabUsersBtn">Usuarios</button>
     </div>
+
+    <!-- ======================= SECCIÓN DOCUMENTOS ======================= -->
+    <section id="sectionDocs">
+        <div class="w3-card-4 vault-card w3-padding w3-round w3-margin-bottom">
+            <h3 class="w3-text-yellow" id="docFormTitle">Agregar Nuevo Documento</h3>
+            <form id="docForm">
+                <div class="w3-row-padding">
+                    <div class="w3-col l6 m12 s12">
+                        <label>Título *</label>
+                        <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="docTitle" required>
+                    </div>
+                    <div class="w3-col l6 m12 s12">
+                        <label>Autor *</label>
+                        <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="docAuthor" required>
+                    </div>
+                </div>
+
+                <div class="w3-row-padding w3-margin-top">
+                    <div class="w3-col l4 m12 s12">
+                        <label>ISBN</label>
+                        <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="docIsbn">
+                    </div>
+                    <div class="w3-col l4 m12 s12">
+                        <label>Categoría</label>
+                        <select class="w3-select w3-border w3-round vault-card w3-text-white" id="docCategory">
+                            <option value="Novela">Novela</option>
+                            <option value="Cuento">Cuento</option>
+                            <option value="Poesía">Poesía</option>
+                            <option value="Ensayo">Ensayo</option>
+                            <option value="Técnico">Técnico</option>
+                            <option value="Historia">Historia</option>
+                            <option value="Infantil">Infantil</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="w3-col l4 m12 s12">
+                        <label>Año</label>
+                        <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="number" id="docYear">
+                    </div>
+                </div>
+
+                <div class="w3-margin-top">
+                    <label>Descripción</label>
+                    <textarea class="w3-input w3-border w3-round w3-transparent w3-text-white" id="docDescription" rows="2"></textarea>
+                </div>
+
+                <div class="w3-margin-top" id="fileFieldWrap">
+                    <label>Archivo *</label>
+                    <input class="w3-input w3-border w3-round" type="file" id="documentFile"
+                           accept=".pdf,.epub,.doc,.docx,.odt,.rtf,.txt,.md,.djvu,.mobi,.azw3,.ppt,.pptx,.xls,.xlsx,.csv,.ods,.odp,.jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff,.svg,.mp3,.wav,.ogg,.m4a,.flac,.mp4,.webm,.ogv,.mov">
+                    <p class="w3-small">Formatos: documentos, libros, planillas, presentaciones, imágenes y media.</p>
+                </div>
+
+                <button type="submit" class="w3-button w3-yellow w3-round-large w3-margin-top" id="docSubmitBtn">
+                    <b>AGREGAR A LA BIBLIOTECA</b>
+                </button>
+                <button type="button" class="w3-button w3-grey w3-round-large w3-margin-top" id="docCancelBtn" style="display:none;">
+                    Cancelar edición
+                </button>
+            </form>
+        </div>
+
+        <div class="w3-responsive">
+            <table class="w3-table w3-striped w3-bordered vault-card">
+                <thead>
+                    <tr class="bt-thead">
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Categoría</th>
+                        <th>Año</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="documentsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ======================= SECCIÓN APROBACIONES ======================= -->
+    <section id="sectionApprovals" style="display:none;">
+        <h2 class="w3-text-white">Material pendiente de revisión</h2>
+        <p>Aprueba para publicar en la app o rechaza para descartar.</p>
+
+        <div class="w3-responsive">
+            <table class="w3-table w3-striped w3-bordered vault-card">
+                <thead>
+                    <tr class="bt-thead">
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Subido por</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingTableBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ======================= SECCIÓN USUARIOS ======================= -->
+    <section id="sectionUsers" style="display:none;">
+        <h2 class="w3-text-white">Usuarios registrados</h2>
+        <p>Visualización global de la base de datos.</p>
+
+        <div class="w3-responsive">
+            <table class="w3-table w3-striped w3-bordered vault-card">
+                <thead>
+                    <tr class="bt-thead">
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Rol</th>
+                        <th>Fecha Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
 </div>
 
 <script src="../js/services/apiService.js"></script>

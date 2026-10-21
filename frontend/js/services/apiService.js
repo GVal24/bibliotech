@@ -1,12 +1,11 @@
 /**
-*    Project     : Sample Vault
+*    Project     : Bibliotech
 *    Author      : Tecnologías Informáticas B - Facultad de Ingeniería - UNMdP
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Marzo 2026
 */
 
 // Configuración base de la API
-// Este comentario va a dar conflicto
 const API_URL = "/api";
 
 const apiService = {
@@ -28,8 +27,8 @@ const apiService = {
         const response = await fetch(`${API_URL}${endpoint}`, config);
         const result = await response.json();
 
-        // Si el token expiró (401), forzamos logout automático
-        if (response.status === 401) authHelper.logout();
+        // Si el token expiró (401) y había sesión activa, forzamos logout automático
+        if (response.status === 401 && token) authHelper.logout();
 
         if (!response.ok) throw new Error(result.message || 'Error en la petición');
         return result;

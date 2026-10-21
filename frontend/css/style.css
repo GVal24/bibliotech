@@ -1,28 +1,233 @@
-/* Colores personalizados para SampleVault */
-:root {
-    --vault-gold: #ffcc00;
-    --vault-dark: #121212;
-    --vault-grey: #242424;
+/* =========================================================================
+   Bibliotech - Paleta e identidad visual
+   Colores tomados del logo institucional (azul marino + celeste).
+
+   Dos temas intercambiables (selector en el navbar):
+     - oceano (estándar)  : fondo azul marino profundo, acentos celeste
+     - celeste (claro)    : fondo celeste claro, texto azul marino
+   El tema activo se marca con [data-theme="..."] en <html>.
+
+   Referencia de color (logo):
+     #003060  azul marino profundo      #184878  azul medio
+     #0078d8  azul vivo                 #4db8ff  celeste
+     #4890a8  celeste apagado           #d8f0f0  celeste muy claro
+   ========================================================================= */
+
+/* ---------- Tema OCÉANO (por defecto, oscuro) ---------- */
+:root,
+[data-theme="oceano"] {
+    --bg:            #04203c;   /* fondo general (azul marino muy profundo) */
+    --bg-elev:       #06294c;   /* navbar / barras */
+    --surface:       #0a3560;   /* tarjetas */
+    --surface-2:     #0f4273;   /* filas alternas / hover */
+    --border:        #2a5f96;   /* bordes suaves */
+    --text:          #eaf4fb;   /* texto (blanco azulado) */
+    --text-muted:    #a9c6e0;   /* texto secundario */
+    --accent:        #4db8ff;   /* celeste */
+    --accent-strong: #7fceff;   /* celeste claro (hover) */
+    --accent-2:      #0078d8;   /* azul vivo */
+    --on-accent:     #04203c;   /* texto sobre el acento */
+    --danger:        #e06a5a;
+    --success:       #52b788;
+    --info:          #4890a8;
 }
 
+/* ---------- Tema CELESTE (claro) ---------- */
+[data-theme="celeste"] {
+    --bg:            #eaf4fb;   /* fondo clarito */
+    --bg-elev:       #d8ecfb;
+    --surface:       #ffffff;
+    --surface-2:     #f2f9ff;
+    --border:        #b8d4ea;
+    --text:          #04203c;   /* azul marino */
+    --text-muted:    #3a6084;
+    --accent:        #0078d8;   /* azul vivo (accent en claro) */
+    --accent-strong: #0062b0;
+    --accent-2:      #4890a8;
+    --on-accent:     #ffffff;
+    --danger:        #c0452f;
+    --success:       #2f8f5b;
+    --info:          #2f6f8f;
+}
+
+/* ---------- Base ---------- */
 body {
-    background-color: var(--vault-dark);
-    color: white;
+    background-color: var(--bg);
+    color: var(--text);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color .25s ease, color .25s ease;
 }
 
-td{
-    background-color: #242424;
+a { color: var(--accent); }
+a:hover { color: var(--accent-strong); }
+
+/* ---------- Navbar / barras ---------- */
+.bt-nav {
+    background-color: var(--bg-elev) !important;
+    border-bottom: 2px solid var(--accent);
+    color: var(--text) !important;
+}
+.bt-nav .bt-brand {
+    color: var(--text);
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.bt-nav .bt-subtitle { color: var(--text-muted); }
+
+/* Logo en el navbar */
+.bt-logo {
+    height: 34px;
+    width: auto;
+    margin-right: 10px;
+    vertical-align: middle;
+    border-radius: 6px;
 }
 
-.vault-card {
-    background-color: var(--vault-grey) !important;
-    border: 1px solid #333;
+/* Logo grande para pantallas de acceso / landing */
+.bt-logo-lg {
+    display: block;
+    max-width: 220px;
+    height: auto;
+    margin: 0 auto 12px;
 }
 
-/* Reproductor de audio personalizado minimalista */
-audio {
-    filter: sepia(20%) saturate(70%) grayscale(1) contrast(99%) invert(12%);
-    width: 100%;
-    height: 30px;
+/* ---------- Tarjetas ---------- */
+.vault-card,
+.bt-card {
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
 }
+
+/* ---------- Tablas ---------- */
+.w3-table td,
+.w3-table th { border-color: var(--border) !important; }
+
+.w3-table td { background-color: var(--surface); color: var(--text); }
+
+.w3-table.w3-striped tbody tr:nth-child(even) td { background-color: var(--surface-2); }
+
+.bt-thead th {
+    background-color: var(--accent) !important;
+    color: var(--on-accent) !important;
+    font-weight: 700;
+}
+
+/* ---------- Texto de acento ---------- */
+.w3-text-yellow { color: var(--accent) !important; }
+
+/* ---------- Inputs ---------- */
+.bt-nav input,
+.vault-card input,
+.vault-card select,
+.vault-card textarea { color: var(--text) !important; }
+
+.vault-card input.w3-border,
+.vault-card select.w3-border,
+.vault-card textarea.w3-border { border-color: var(--border) !important; }
+
+.vault-card select option { background-color: var(--surface); color: var(--text); }
+
+/* ---------- Botones ---------- */
+.w3-button.w3-yellow,
+.bt-btn {
+    background-color: var(--accent) !important;
+    color: var(--on-accent) !important;
+    border: none;
+}
+.w3-button.w3-yellow:hover,
+.bt-btn:hover { background-color: var(--accent-strong) !important; }
+
+.btn-logout {
+    background-color: transparent !important;
+    color: var(--text) !important;
+    border: 1px solid var(--accent) !important;
+}
+.btn-logout:hover { background-color: var(--accent) !important; color: var(--on-accent) !important; }
+
+/* Botón secundario (contorno) */
+.bt-btn-ghost {
+    background-color: transparent !important;
+    color: var(--accent) !important;
+    border: 2px solid var(--accent) !important;
+}
+.bt-btn-ghost:hover { background-color: var(--accent) !important; color: var(--on-accent) !important; }
+
+/* Tabs del panel */
+.bt-tabs {
+    background-color: var(--bg-elev) !important;
+    border: 1px solid var(--border);
+}
+.bt-tabs .tab-btn {
+    color: var(--text) !important;
+    background-color: transparent !important;
+}
+.bt-tabs .tab-btn:hover { background-color: var(--surface-2) !important; }
+.bt-tabs .tab-btn.is-active {
+    background-color: var(--accent) !important;
+    color: var(--on-accent) !important;
+}
+
+/* ---------- Selector de tema ---------- */
+.bt-theme-toggle {
+    background-color: transparent !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    cursor: pointer;
+}
+.bt-theme-toggle:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+.bt-theme-toggle.is-active {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    font-weight: 700;
+}
+
+/* ---------- Landing / hero ---------- */
+.bt-hero {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px 16px;
+}
+.bt-hero-logo {
+    max-width: 320px;
+    height: auto;
+    margin-bottom: 24px;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,.35));
+}
+.bt-hero h1 {
+    font-size: 2.6rem;
+    letter-spacing: 2px;
+    margin: 0 0 8px;
+    color: var(--text);
+}
+.bt-hero-tagline {
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    max-width: 640px;
+    margin: 0 auto 32px;
+}
+.bt-hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Tarjetas de características en la landing */
+.bt-feature {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 22px;
+    height: 100%;
+}
+.bt-feature h3 { color: var(--accent); margin-top: 0; }
+.bt-feature p { color: var(--text-muted); }
+
+/* ---------- Visor de PDF ---------- */
+embed { border-radius: 4px; }

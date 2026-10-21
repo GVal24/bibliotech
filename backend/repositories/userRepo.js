@@ -18,7 +18,7 @@ class UserRepository
     }
 
     // Crear un nuevo usuario y asignar su rol en una sola operación atómica
-    async create(username, hashedPassword, role = 'producer') 
+    async create(username, hashedPassword, role = 'student') 
     {
         const [rows] = await db.execute(
             'CALL sp_create_user(?, ?, ?)',
@@ -35,7 +35,14 @@ class UserRepository
         return rows[0]; 
     }
 
-    // Borrar un usuario (la integridad referencial se encarga de sus samples y roles)
+    // Cambiar el rol de un usuario (administración de roles)
+    async updateRole(id, roleName)
+    {
+        await db.execute('CALL sp_update_user_role(?, ?)', [id, roleName]);
+        return true;
+    }
+
+    // Borrar un usuario (la integridad referencial se encarga de sus documentos y roles)
     async delete(id) 
     {
         // En los SP de acción (DELETE/UPDATE), verificamos que la ejecución no lance error

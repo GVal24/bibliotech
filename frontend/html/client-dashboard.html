@@ -2,70 +2,120 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Bibliotech - Mis Documentos</title>
+    <title>Bibliotech - Catálogo</title>
     <link rel="stylesheet" href="../css/w3.css">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="icon" type="image/png" href="../img/favicon.png">
+    <script src="../js/utils/themeSwitcher.js"></script>
 </head>
 <body>
 
-<div class="w3-bar w3-black w3-border-bottom w3-border-dark-grey">
-    <span class="w3-bar-item w3-text-yellow"><b>BIBLIOTECH</b></span>
-    <button class="w3-bar-item w3-button w3-right btn-logout">Salir</button>
+<div class="w3-bar bt-nav">
+    <span class="w3-bar-item bt-brand">
+        <img src="../img/logo.png" alt="Bibliotech" class="bt-logo"><b>BIBLIOTECH</b>
+    </span>
+    <span class="w3-bar-item bt-subtitle">Catálogo de la biblioteca</span>
+    <span class="w3-bar-item w3-right" data-theme-toggle></span>
+    <span class="w3-bar-item w3-right" id="sessionArea">
+        <a class="w3-button w3-yellow w3-round" href="/login" id="loginLink">Iniciar sesión</a>
+        <button class="w3-button w3-round btn-logout" style="display:none;" id="logoutBtn">Salir</button>
+    </span>
 </div>
 
 <div class="w3-container w3-padding-32">
-    <div class="w3-row-padding">
-        
-        <div class="w3-col l4 m5 s12">
-            <div class="w3-card-4 vault-card w3-padding w3-round">
-                <h3 class="w3-text-yellow">Subir Nuevo Documento</h3>
-                <form id="uploadForm">
-                    <label>Ttulo del Documento</label>
-                    <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="display_name" required>
-                    
-                    <label class="w3-margin-top w3-show">Categoría</label>
-                    <select class="w3-select w3-border w3-round w3-black w3-text-white" id="category">
-                        <option value="Kick">Kick (Bombo)</option>
-                        <option value="Snare">Snare (Redoblante)</option>
-                        <option value="Hi-Hat">Hi-Hat</option>
-                        <option value="Loop">Melody Loop</option>
-                        <option value="FX">Efectos (FX)</option>
-                    </select>
 
-                    <label class="w3-margin-top w3-show">Ao (Opcional)</label>
-                    <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="number" id="year" value="120">
-
-                    <label class="w3-margin-top w3-show">Archivo de Audio (WAV/MP3)</label>
-                    <input class="w3-input w3-border w3-round" type="file" id="documentFile" accept="application/pdf" required>
-
-                    <button type="submit" class="w3-button w3-yellow w3-block w3-round-large w3-margin-top">
-                        <b>CARGAR A LA BIBLIOTECA</b>
-                    </button>
-                </form>
+    <div class="w3-card-4 vault-card w3-padding w3-round w3-margin-bottom">
+        <h3 class="w3-text-yellow">Buscar en el catálogo</h3>
+        <div class="w3-row">
+            <div class="w3-col s9 m10">
+                <input class="w3-input w3-border w3-round w3-transparent w3-text-white"
+                       type="text" id="searchInput" placeholder="Título, autor, ISBN o categoría...">
+            </div>
+            <div class="w3-col s3 m2" style="padding-left:8px;">
+                <button class="w3-button w3-yellow w3-block w3-round" id="searchBtn">Buscar</button>
             </div>
         </div>
-
-        <div class="w3-col l8 m7 s12">
-            <h3 class="w3-text-white">Mi Biblioteca Privada</h3>
-            <div class="w3-responsive">
-                <table class="w3-table w3-striped w3-bordered vault-card">
-                    <thead>
-                        <tr class="w3-yellow">
-                            <th>Nombre</th>
-                            <th>Categoría</th>
-                            <th>Ao</th>
-                            <th>Ver/Descargar</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="documentsTableBody">
-                        </tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
+
+    <!-- Solo para Student autenticado: propone material (queda pendiente de aprobación) -->
+    <div class="w3-card-4 vault-card w3-padding w3-round w3-margin-bottom" id="contributorCard" style="display:none;">
+        <h3 class="w3-text-yellow">Compartir material</h3>
+        <p class="w3-small">Tu material será revisado por un profesor o administrador antes de publicarse.</p>
+        <form id="contributorForm">
+            <div class="w3-row-padding">
+                <div class="w3-col l6 m12 s12">
+                    <label>Título *</label>
+                    <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="contribTitle" required>
+                </div>
+                <div class="w3-col l6 m12 s12">
+                    <label>Autor *</label>
+                    <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="contribAuthor" required>
+                </div>
+            </div>
+            <div class="w3-row-padding w3-margin-top">
+                <div class="w3-col l4 m12 s12">
+                    <label>ISBN</label>
+                    <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="text" id="contribIsbn">
+                </div>
+                <div class="w3-col l4 m12 s12">
+                    <label>Categoría</label>
+                    <select class="w3-select w3-border w3-round vault-card w3-text-white" id="contribCategory">
+                        <option value="Apunte">Apunte</option>
+                        <option value="Técnico">Técnico</option>
+                        <option value="Ensayo">Ensayo</option>
+                        <option value="Novela">Novela</option>
+                        <option value="Cuento">Cuento</option>
+                        <option value="Historia">Historia</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="w3-col l4 m12 s12">
+                    <label>Año</label>
+                    <input class="w3-input w3-border w3-round w3-transparent w3-text-white" type="number" id="contribYear">
+                </div>
+            </div>
+            <div class="w3-margin-top">
+                <label>Descripción</label>
+                <textarea class="w3-input w3-border w3-round w3-transparent w3-text-white" id="contribDescription" rows="2"></textarea>
+            </div>
+            <div class="w3-margin-top">
+                <label>Archivo *</label>
+                <input class="w3-input w3-border w3-round" type="file" id="contribFile"
+                       accept=".pdf,.epub,.doc,.docx,.odt,.rtf,.txt,.md,.djvu,.mobi,.azw3,.ppt,.pptx,.xls,.xlsx,.csv,.ods,.odp,.jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff,.svg,.mp3,.wav,.ogg,.m4a,.flac,.mp4,.webm,.ogv,.mov" required>
+                <p class="w3-small">Formatos: documentos, libros, planillas, presentaciones, imágenes y media.</p>
+            </div>
+            <button type="submit" class="w3-button w3-yellow w3-round-large w3-margin-top"><b>ENVIAR PARA REVISIÓN</b></button>
+        </form>
+    </div>
+
+    <div class="w3-responsive">
+        <table class="w3-table w3-striped w3-bordered vault-card">
+            <thead>
+                <tr class="bt-thead">
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Categoría</th>
+                    <th>Año</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="documentsTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="w3-card-4 vault-card w3-padding w3-round w3-margin-top" id="viewerCard" style="display:none;">
+        <div class="w3-row">
+            <div class="w3-col s8">
+                <h3 class="w3-text-yellow" id="viewerTitle">Documento</h3>
+            </div>
+            <div class="w3-col s4 w3-right-align">
+                <button id="viewerDownload" class="w3-button w3-blue w3-round w3-margin-top">Descargar</button>
+            </div>
+        </div>
+        <embed id="pdfViewer" type="application/pdf" width="100%" height="700px">
+    </div>
+
 </div>
 
 <script src="../js/services/apiService.js"></script>

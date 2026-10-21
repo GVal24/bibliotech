@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliotech - Biblioteca digital</title>
+    <link rel="stylesheet" href="../css/w3.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" type="image/png" href="../img/favicon.png">
+    <script src="../js/utils/themeSwitcher.js"></script>
+</head>
+<body>
+
+<div class="w3-bar bt-nav">
+    <span class="w3-bar-item bt-brand">
+        <img src="../img/logo.png" alt="Bibliotech" class="bt-logo"><b>BIBLIOTECH</b>
+    </span>
+    <span class="w3-bar-item bt-subtitle">Biblioteca digital</span>
+    <span class="w3-bar-item w3-right" data-theme-toggle></span>
+    <span class="w3-bar-item w3-right" id="sessionArea">
+        <a class="w3-button w3-yellow w3-round" href="/login" id="loginLink">Ingresar</a>
+        <a class="w3-button w3-round bt-btn-ghost" href="/register" id="registerLink">Crear cuenta</a>
+        <a class="w3-button w3-round" href="/catalog" id="dashboardLink" style="display:none;">Mi panel</a>
+        <button class="w3-button w3-round btn-logout" style="display:none;" id="logoutBtn">Salir</button>
+    </span>
+</div>
+
+<!-- ======================= HERO ======================= -->
+<section class="bt-hero">
+    <img src="../img/logo.png" alt="Logo Bibliotech" class="bt-hero-logo">
+    <h1>BIBLIOTECH</h1>
+    <p class="bt-hero-tagline">
+        Tu biblioteca digital: explorá, compartí y consultá material bibliográfico en PDF.
+        Estudiantes proponen, profesores y administradores curan el catálogo.
+    </p>
+    <div class="bt-hero-actions">
+        <a href="/catalog" class="w3-button w3-yellow w3-round-large w3-padding-large"><b>EXPLORAR EL CATÁLOGO</b></a>
+        <a href="/login" class="w3-button bt-btn-ghost w3-round-large w3-padding-large"><b>INGRESAR</b></a>
+    </div>
+</section>
+
+<!-- ======================= CARACTERÍSTICAS ======================= -->
+<div class="w3-container w3-padding-32" style="max-width:1100px;margin:0 auto;">
+    <div class="w3-row-padding">
+        <div class="w3-col l4 m12 s12 w3-margin-bottom">
+            <div class="bt-feature">
+                <h3>Catálogo público</h3>
+                <p>Consultá el material aprobado y leelo o descargalo directamente, incluso sin iniciar sesión.</p>
+            </div>
+        </div>
+        <div class="w3-col l4 m12 s12 w3-margin-bottom">
+            <div class="bt-feature">
+                <h3>Comunidad que aporta</h3>
+                <p>Los estudiantes pueden proponer material; profesores y administradores lo revisan antes de publicarlo.</p>
+            </div>
+        </div>
+        <div class="w3-col l4 m12 s12 w3-margin-bottom">
+            <div class="bt-feature">
+                <h3>Roles y control</h3>
+                <p>Estudiante, Profesor y Administrador, con permisos claros y un flujo de aprobación transparente.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= ROLES ======================= -->
+<div class="w3-container w3-padding-16" style="max-width:1100px;margin:0 auto;">
+    <h2 class="w3-center">¿Cómo funciona?</h2>
+    <div class="w3-row-padding">
+        <div class="w3-col l4 m12 s12 w3-margin-bottom">
+            <div class="bt-feature">
+                <h3>Estudiante</h3>
+                <p>Explora el catálogo y propone apuntes o material. Sus aportes quedan <em>pendientes</em> hasta ser aprobados.</p>
+            </div>
+        </div>
+        <div class="w3-col l4 m12 s12 w3-margin-bottom">
+            <div class="bt-feature">
+                <h3>Profesor</h3>
+                <p>Publica material directamente y aprueba o rechaza lo propuesto por los estudiantes.</p>
+            </div>
+        </div>
+        <div class="w3-col l4 m12 s12 w3-margin-bottom">
+            <div class="bt-feature">
+                <h3>Administrador</h3>
+                <p>Gestiona documentos, usuarios y asigna roles en todo el sistema.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="w3-container w3-center w3-padding-32" style="color:var(--text-muted);">
+    <p>Bibliotech &mdash; ISFT N°151 &middot; Marzo 2026</p>
+</footer>
+
+<script src="../js/services/apiService.js"></script>
+<script src="../js/utils/authHelper.js"></script>
+<script src="../js/frontControllers/landingFrontController.js"></script>
+</body>
+</html>

@@ -13,8 +13,10 @@
  * y credenciales sensibles (claves API, credenciales de bases de datos, 
  * tokens) fuera del código fuente. Se sitúa en la raíz del proyecto, 
  * usa pares clave-valor y nunca debe subirse al control de versiones (Git). 
+ * Se usa 'override: true' para que el .env del proyecto tenga prioridad sobre
+ * variables de entorno del sistema que puedan colisionar (ej: DB_NAME).
  */
- require('dotenv').config();
+ require('dotenv').config({ override: true });
 
 /**
  * Express es un framework web minimalista, rápido y flexible para Node.js, 
@@ -57,11 +59,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- Configuración de Carpetas y Rutas Estáticas ---
-// Carpeta de subidas (Audios) Crear 'uploads' si no existe al iniciar el server
+// --- Configuración de Carpetas --- 
+// Carpeta de subidas (documentos) Crear 'uploads' si no existe al iniciar el server.
+// OJO: la carpeta NO se sirve como estática. Los archivos se entregan a través de
+// endpoints controlados (/api/documents/:id/file  y  /:id/download) para poder exigir
+// sesión en la descarga y registrar/controlar el acceso.
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-app.use('/uploads', express.static(uploadDir));
 
 // Servir archivos estáticos del FRONTEND 
 // (esto permite que el HTML acceda a ../css y ../js)
@@ -92,7 +96,7 @@ else
 // --- Manejo de errores global ---
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ message: "Error en el servidor", error: err.message });
+    res.status(err.status || 500).json({ message: "Error en el servidor", error: err.message });
 });
 
 const PORT = process.env.PORT || 3000;
