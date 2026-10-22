@@ -108,14 +108,19 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Límite de tamaño (60 MB) para evitar subidas desmedidas.
+// Límite de tamaño: 10 MB. Cloudinary (plan Free) rechaza archivos más grandes,
+// por eso alineamos Multer a ese mismo tope para dar un mensaje claro ANTES
+// de intentar la subida a la nube.
+const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 const upload = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 60 * 1024 * 1024 }
+    limits: { fileSize: MAX_FILE_SIZE_BYTES }
 });
 
 // 'documentFile' es el nombre del campo en el formulario
 module.exports = upload.single('documentFile');
 module.exports.ALLOWED_EXTENSIONS = ALLOWED_EXTENSIONS;
 module.exports.usingCloudinary = isConfigured;
+module.exports.MAX_FILE_SIZE_MB = MAX_FILE_SIZE_MB;

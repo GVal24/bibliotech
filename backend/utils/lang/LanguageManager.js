@@ -18,7 +18,7 @@ const LanguageManager = {
             'file.pdf.only': 'Solo se permiten archivos PDF.',
             'file.type.only': 'Tipo de archivo no permitido.',
             'file.noExtension': 'El archivo no tiene extensión. Renombralo agregando una extensión válida (por ejemplo: .pdf).',
-            'file.tooLarge': 'El archivo supera el tamaño máximo permitido (60 MB).',
+            'file.tooLarge': 'El archivo supera el tamaño máximo permitido (10 MB). Comprimí el archivo o subí una versión más liviana.',
             'file.required': 'Debes adjuntar un archivo.',
 
             // Autenticación
@@ -67,7 +67,7 @@ const LanguageManager = {
             'file.pdf.only': 'Only PDF files are allowed.',
             'file.type.only': 'File type not allowed.',
             'file.noExtension': 'The file has no extension. Rename it by adding a valid extension (for example: .pdf).',
-            'file.tooLarge': 'File exceeds the maximum allowed size (60 MB).',
+            'file.tooLarge': 'File exceeds the maximum allowed size (10 MB). Compress the file or upload a lighter version.',
             'file.required': 'You must attach a file.',
 
             // Authentication

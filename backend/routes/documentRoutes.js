@@ -37,6 +37,14 @@ function handleUpload(req, res, next) {
                     error: err.message
                 });
             }
+            // Error de tamaño reportado por el almacenamiento en la nube
+            // (Cloudinary responde "File size too large..."). Lo tratamos como 400 claro.
+            if (/file size too large|maximum is|too large/i.test(err.message || '')) {
+                return res.status(400).json({
+                    message: lang.t('file.tooLarge'),
+                    error: err.message
+                });
+            }
             // Cualquier otro error (por ejemplo, de almacenamiento en la nube):
             // mostramos el detalle real para que sea diagnosticable.
             return res.status(500).json({
