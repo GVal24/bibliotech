@@ -1,10 +1,10 @@
 /**
  * Filtro: fortaleza de contraseña.
  * Exige 8 caracteres como mínimo, al menos una letra y al menos un número.
- * @param {string} msg - mensaje de error.
+ * El mensaje detalla qué requisito falta, para que el usuario lo entienda.
+ * @param {string} msg - mensaje de error (opcional).
  */
 module.exports = function strongPassword(msg) {
-    const message = msg || 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra y un número.';
     return function (value) {
         if (value === null || value === undefined || String(value).trim() === '') return { valid: true };
 
@@ -14,6 +14,13 @@ module.exports = function strongPassword(msg) {
         const hasNumber = /[0-9]/.test(password);
 
         if (hasMinLength && hasLetter && hasNumber) return { valid: true };
-        return { valid: false, message };
+
+        // Construimos la lista de lo que falta, para un mensaje preciso.
+        const missing = [];
+        if (!hasMinLength) missing.push('al menos 8 caracteres (tiene ' + password.length + ')');
+        if (!hasLetter) missing.push('al menos una letra');
+        if (!hasNumber) missing.push('al menos un número');
+
+        return { valid: false, message: 'La contraseña debe incluir ' + missing.join(' y ') + '.' };
     };
 };

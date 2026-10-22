@@ -43,7 +43,7 @@ function validateRegistration(username, password) {
         ]))
         .with(new FieldValidator('password', password, [
             required(lang.t('field.required')),
-            strongPassword(lang.t('auth.password.invalid'))
+            strongPassword()
         ]));
 
     handler.validate();
