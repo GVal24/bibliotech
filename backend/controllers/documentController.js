@@ -96,11 +96,10 @@ async function sendDocumentFile(res, document, disposition) {
 
     // --- Archivo alojado en la nube (Cloudinary) ---
     if (/^https?:\/\//.test(filePath)) {
-        if (disposition !== 'attachment') {
-            return res.redirect(filePath);
-        }
-
-        // Descarga: traemos el archivo y lo reenviamos con el nombre correcto.
+        // Proxy: pedimos el archivo al proveedor y lo reenviamos a través del backend.
+        // Así NO se expone la URL pública de Cloudinary (que cualquiera podría copiar
+        // y descargar sin token). Se usa tanto para 'inline' (ver) como 'attachment'
+        // (descargar), respetando la autorización que ya validó el controlador.
         try {
             const upstream = await fetch(filePath);
             if (!upstream.ok) {
@@ -110,7 +109,7 @@ async function sendDocumentFile(res, document, disposition) {
             res.setHeader('Content-Type', contentTypeFor(document.filename || filePath));
             res.setHeader(
                 'Content-Disposition',
-                'attachment; filename="' + (document.filename || 'documento') + '"'
+                disposition + '; filename="' + (document.filename || 'documento') + '"'
             );
             return res.send(buffer);
         }

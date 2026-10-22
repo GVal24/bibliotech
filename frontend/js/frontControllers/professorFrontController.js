@@ -242,7 +242,7 @@ function openViewer(doc) {
 
     const token = authHelper.getToken();
     const embed = document.getElementById('pdfViewer');
-    embed.src = `/api/documents/${doc.id}/file?token=${encodeURIComponent(token || '')}`;
+    embed.src = `/api/documents/${doc.id}/file?token=${encodeURIComponent(token || '')}#toolbar=0`;
 
     const downloadBtn = document.getElementById('viewerDownload');
     if (downloadBtn) {

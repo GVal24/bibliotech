@@ -178,7 +178,9 @@ function openViewer(doc) {
 
     const embed = document.getElementById('pdfViewer');
     // Endpoint público de lectura (inline). No requiere token.
-    embed.src = `/api/documents/${doc.id}/file`;
+    // #toolbar=0 oculta la barra del visor PDF del navegador para desalentar
+    // el guardado directo desde el visor (la descarga "real" exige token).
+    embed.src = `/api/documents/${doc.id}/file#toolbar=0`;
 
     const downloadBtn = document.getElementById('viewerDownload');
     if (downloadBtn) {
