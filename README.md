@@ -9,18 +9,18 @@
 
 ## 🎯 Características Principales
 
-* 📚 **Gestión documental:** Subida de archivos (PDF, EPUB, ofimática, imágenes y media) con metadatos (título, autor, ISBN, categoría/materia, año, descripción).
-* 👀 **Lectura online pública:** Visualización del material en el sitio para cualquier usuario, sin iniciar sesión.
-* 🔒 **Descarga sólo para registrados:** Los visitantes anónimos pueden leer online; descargar exige tener una cuenta.
-* 🧑‍🤝‍🧑 **Tres roles:** Student (consulta, propone y descarga), Professor (publica y aprueba) y Administrador (gestión total + roles).
-* ✅ **Flujo de aprobación:** El material de los Students se revisa antes de publicarse.
-* ♻️ **Baja de usuario sin perder material:** Al eliminar un usuario sus documentos **se conservan** (quedan "sin dueño", `user_id = NULL`).
-* ♿ **Accesibilidad:** El navbar incluye un **ícono de accesibilidad** con un panel y deslizador para agrandar el texto de todo el sitio **hasta el 200%**, pensado para personas con baja visión (se guarda en `localStorage`).
-* 🏗️ **Arquitectura limpia:** Separación de responsabilidades entre controladores, repositorios, servicios y utilidades (N capas).
-* 🧩 **Validación modular (filtros) + Manejador de lenguaje:** Validación desacoplada del dominio y mensajes centralizados ES/EN.
-* 📂 **Control de tipos de archivo:** Lista blanca de extensiones (ver *Formatos admitidos*) y límite de tamaño.
-* 🛡️ **Frontend "Zero innerHTML":** Manipulación del DOM 100% nativa.
-* 🌱 **Sostenibilidad de Software:** Enfoque modular y reutilizable.
+* **Gestión documental:** Subida de archivos (PDF, EPUB, ofimática, imágenes y media) con metadatos (título, autor, ISBN, categoría/materia, año, descripción).
+* **Lectura online pública:** Visualización del material en el sitio para cualquier usuario, sin iniciar sesión.
+* **Descarga sólo para registrados:** Los visitantes anónimos pueden leer online, descargar exige tener una cuenta.
+* **Tres roles:** Student (consulta, propone y descarga), Professor (publica y aprueba) y Administrador (gestión total + roles).
+* **Flujo de aprobación:** El material de los Students se revisa antes de publicarse.
+* **Baja de usuario sin perder material:** Al eliminar un usuario sus documentos **se conservan**.
+* **Accesibilidad:** El navbar incluye un **ícono de accesibilidad** con un panel y deslizador para agrandar el texto de todo el sitio **hasta el 200%**, pensado para personas con baja visión.
+* **Arquitectura limpia:** Separación de responsabilidades entre controladores, repositorios, servicios y utilidades (N capas).
+* **Validación modular (filtros) + Manejador de lenguaje:** Validación desacoplada del dominio y mensajes centralizados ES/EN.
+* **Control de tipos de archivo:** Lista blanca de extensiones (ver *Formatos admitidos*) y límite de tamaño.
+* **Frontend "Zero innerHTML":** Manipulación del DOM 100% nativa.
+* **Sostenibilidad de Software:** Enfoque modular y reutilizable.
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -45,7 +45,7 @@
 | --- | --- |
 | **Student** | Consulta el catálogo público y puede **proponer material** (queda en estado `pending` hasta ser aprobado). |
 | **Professor** | Publica material **directamente**, **aprueba/rechaza** lo propuesto por los Students y puede **borrar documentos** del catálogo. |
-| **Admin** | Todo: gestión de documentos, usuarios y asignación de roles. |
+| **Admin** | Control total: gestión de documentos, usuarios y asignación de roles. |
 
 El catálogo es de **acceso público**: un visitante sin cuenta puede **leer online** el material sin iniciar sesión. La **descarga** y la **subida** son exclusivas de usuarios registrados.
 
@@ -120,9 +120,9 @@ Si tu servidor usa otro puerto (p. ej. 3307), ajustá `DB_*` en el `.env`.
 
 La aplicación está publicada y no depende de la PC de desarrollo:
 
-* 🖥️ **Backend + frontend:** [Render](https://render.com) (Web Service, plan Free).
-* 🗄️ **Base de datos:** [Aiven for MySQL](https://aiven.io) (plan Free) — soporta **procedimientos almacenados**, requisito de este proyecto.
-* ☁️ **Archivos:** [Cloudinary](https://cloudinary.com) — los documentos subidos se guardan en la nube (el disco de Render es efímero).
+* 🖥️ **Backend + frontend:** [Render](https://render.com) (Web Service).
+* 🗄️ **Base de datos:** [Aiven for MySQL](https://aiven.io).
+* ☁️ **Archivos:** [Cloudinary](https://cloudinary.com).
 
 ### Modo dual (detección automática)
 
@@ -152,7 +152,7 @@ CLOUDINARY_API_SECRET=<api secret>
 * **Start Command:** `node server.js`
 * **Instance Type:** `Free`
 
-> En el plan Free el servicio **se duerme** tras ~15 min de inactividad: la primera visita puede tardar ~50 s en despertar (conviene abrir la URL un rato antes de una demo/examen).
+> El servicio **se duerme** tras ~15 min de inactividad: la primera visita puede tardar ~50 s en despertar.
 
 ---
 
@@ -165,8 +165,6 @@ El script `init.cloud.sql` (y también `init.sql`) carga tres usuarios listos pa
 | `admin` | `12345` | **Administrador** | Gestión total: documentos, usuarios y **asignación de roles**. |
 | `profe` | `12345` | **Profesor** | Publica material directo y aprueba/rechaza lo propuesto. |
 | `pepe` | `12345` | **Estudiante** | Consulta el catálogo y propone material (queda `pending`). |
-
-> ⚠️ No cambies el rol del propio `admin`: perderías el acceso de administrador.
 
 ---
 
