@@ -23,6 +23,8 @@ const LanguageManager = {
             // Autenticación
             'auth.credentials.required': 'Usuario y contraseña son requeridos.',
             'auth.credentials.incomplete': 'Credenciales incompletas.',
+            'auth.username.invalid': 'El usuario debe tener entre 3 y 50 caracteres y solo admite letras, números y espacios.',
+            'auth.password.invalid': 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra y un número.',
             'auth.register.success': 'Usuario registrado con éxito.',
             'auth.register.error': 'Error interno durante el registro.',
             'auth.user.exists': 'El nombre de usuario ya existe.',
@@ -69,6 +71,8 @@ const LanguageManager = {
             // Authentication
             'auth.credentials.required': 'Username and password are required.',
             'auth.credentials.incomplete': 'Incomplete credentials.',
+            'auth.username.invalid': 'The username must be 3 to 50 characters long and allows only letters, numbers and spaces.',
+            'auth.password.invalid': 'The password must be at least 8 characters long, including a letter and a number.',
             'auth.register.success': 'User registered successfully.',
             'auth.register.error': 'Internal error during registration.',
             'auth.user.exists': 'The username already exists.',

@@ -39,11 +39,11 @@ function validateRegistration(username, password) {
     const handler = new ValidationHandler()
         .with(new FieldValidator('username', username, [
             required(lang.t('field.required')),
-            usernameFormat()
+            usernameFormat(lang.t('auth.username.invalid'))
         ]))
         .with(new FieldValidator('password', password, [
             required(lang.t('field.required')),
-            strongPassword()
+            strongPassword(lang.t('auth.password.invalid'))
         ]));
 
     handler.validate();
@@ -65,12 +65,19 @@ class AuthController
         {
             const { username, password } = req.body;
 
+            // Normalizamos el usuario: quitamos espacios al inicio/fin y
+            // colapsamos espacios internos repetidos ("Guille  Valdez" -> "Guille Valdez").
+            const cleanUsername = (typeof username === 'string')
+                ? username.trim().replace(/\s+/g, ' ')
+                : username;
+
             // 1. Validación modular de presencia + formato
-            const handler = validateRegistration(username, password);
+            const handler = validateRegistration(cleanUsername, password);
             if (handler.hasErrors()) {
+                const errors = handler.getErrors();
                 return res.status(400).json({
-                    message: lang.t('auth.credentials.required'),
-                    errors: handler.getErrors()
+                    message: errors.length ? errors[0].message : lang.t('auth.credentials.required'),
+                    errors
                 });
             }
 
@@ -78,7 +85,7 @@ class AuthController
             
             // 2. Creación mediante el repositorio (que usa el SP sp_create_user)
             //    Todo registro nuevo entra como 'student'.
-            const userId = await userRepo.create(username, hashedPassword, 'student');
+            const userId = await userRepo.create(cleanUsername, hashedPassword, 'student');
             
             res.status(201).json({ 
                 message: lang.t('auth.register.success'), 
