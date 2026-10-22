@@ -54,24 +54,93 @@ El catálogo es de **acceso público**: un visitante sin cuenta puede **leer onl
 ## 📂 Estructura del Proyecto
 
 ```bash
-backend/
-  config/          # db, multer, cloudinaryConfig, init.sql (local), init.cloud.sql (nube), delete.sql
-  controllers/     # Lógica de negocio
-  middleware/      # Autenticación/autorización
-  repositories/    # Acceso a datos (SPs)
-  routes/          # Rutas API
-  uploads/documents/ # Almacenamiento de archivos (servidos por endpoint, no estáticos)
-  utils/           # Helpers, validación modular, manejador de lenguaje
-frontend/
-  css/             # Estilos (temas oceano/celeste)
-  html/            # Vistas (landing/catálogo/professor/admin/login/registro)
-  img/             # Activos visuales (logo, favicon)
-  js/
-    components/    # UI handlers
-    frontControllers/ # Controladores frontend
-    services/      # apiService
-    utils/         # authHelper, themeSwitcher
-    tests/         # Tests
+bibliotech/
+├── backend/
+│   ├── config/
+│   │   ├── db.js                  # Pool de conexiones MySQL/MariaDB (SSL opcional con DB_SSL)
+│   │   ├── multerConfig.js        # Subida de archivos: lista blanca de extensiones y límite (10 MB)
+│   │   ├── cloudinaryConfig.js    # Cliente de Cloudinary (almacenamiento en la nube, modo deploy)
+│   │   ├── init.sql               # Esquema local: DB, usuario/GRANT, tablas, roles, SPs y datos de prueba
+│   │   ├── init.cloud.sql         # Esquema para base gestionada (Aiven): sin CREATE DATABASE/USER/GRANT
+│   │   └── delete.sql             # Limpieza del esquema (dropea objetos)
+│   ├── controllers/
+│   │   ├── authController.js      # Registro e inicio de sesión (JWT + bcrypt)
+│   │   ├── documentController.js  # CRUD de documentos, ver/descargar, aprobar/rechazar
+│   │   └── adminController.js     # Gestión de usuarios y asignación de roles
+│   ├── middleware/
+│   │   └── authMiddleware.js      # verifyToken, verifyTokenFromQuery, optionalToken y control de roles
+│   ├── repositories/
+│   │   ├── userRepo.js            # Acceso a datos de usuarios (vía stored procedures)
+│   │   └── documentRepo.js        # Acceso a datos de documentos (vía stored procedures)
+│   ├── routes/
+│   │   ├── authRoutes.js          # Endpoints de identidad (/api/auth)
+│   │   ├── documentRoutes.js      # Endpoints de documentos (/api/documents)
+│   │   ├── adminRoutes.js         # Endpoints de administración (/api/admin)
+│   │   ├── viewRoutes.js          # Enrutador de las vistas HTML (landing, catálogo, paneles)
+│   │   └── testsRoutes.js         # Ruta condicional del laboratorio de pruebas
+│   ├── uploads/
+│   │   └── documents/             # Archivos en disco local (servidos por endpoint, NO estáticos)
+│   ├── utils/
+│   │   ├── fileHelper.js          # Borrado del archivo en el proveedor (Cloudinary o disco)
+│   │   ├── pdfValidator.js        # Validaciones específicas de archivos PDF
+│   │   ├── lang/
+│   │   │   └── LanguageManager.js # Manejador de lenguaje (mensajes centralizados ES/EN)
+│   │   └── validation/
+│   │       ├── index.js               # Punto de entrada del motor de validación
+│   │       ├── ValidationHandler.js   # Orquestador de reglas (validación modular / filtros)
+│   │       ├── validators/
+│   │       │   └── FieldValidator.js  # Validador de campos (Fluent Interface)
+│   │       └── rules/                 # Reglas desacopladas (Principio Abierto/Cerrado)
+│   │           ├── required.js
+│   │           ├── minLength.js
+│   │           ├── maxLength.js
+│   │           ├── pattern.js
+│   │           ├── emailFormat.js
+│   │           ├── usernameFormat.js
+│   │           └── strongPassword.js
+│   ├── .env.example               # Plantilla de variables de entorno
+│   ├── package.json               # Dependencias y scripts (start → node server.js)
+│   └── server.js                  # Punto de entrada: configuración de Express y pipeline
+├── frontend/
+│   ├── css/
+│   │   ├── style.css              # Estilos y temas (variables CSS: oceano / celeste)
+│   │   └── w3.css                 # Framework estructural W3.CSS
+│   ├── html/
+│   │   ├── landing.html           # Página de inicio (hero, características y acceso)
+│   │   ├── client-dashboard.html  # Vista del estudiante (catálogo, búsqueda y aportes)
+│   │   ├── professor-dashboard.html # Panel del profesor (aprobaciones y catálogo)
+│   │   ├── admin-dashboard.html   # Panel del administrador (documentos, aprobaciones, usuarios)
+│   │   ├── login.html             # Inicio de sesión
+│   │   ├── register.html          # Registro de usuario
+│   │   └── tests.html             # Laboratorio de pruebas del frontend
+│   ├── img/
+│   │   ├── logo.png               # Logotipo de Bibliotech
+│   │   └── favicon.png            # Ícono del sitio
+│   └── js/
+│       ├── components/
+│       │   └── uiHandlers.js      # Constructores de UI dinámica (Zero innerHTML)
+│       ├── frontControllers/
+│       │   ├── landingFrontController.js    # Lógica de la landing (sesión y acceso)
+│       │   ├── authFrontController.js       # Lógica de login/registro
+│       │   ├── documentsFrontController.js  # Lógica del catálogo, visor y aportes
+│       │   ├── professorFrontController.js  # Lógica del panel del profesor
+│       │   └── adminFrontController.js      # Lógica del panel del administrador
+│       ├── services/
+│       │   └── apiService.js      # Cliente Fetch hacia la API (inyecta el JWT)
+│       ├── utils/
+│       │   ├── authHelper.js      # Ciclo de vida de la sesión (localStorage, token, roles)
+│       │   ├── themeSwitcher.js   # Selector de tema (oceano/celeste) persistente
+│       │   ├── fontSizeControl.js # Control de accesibilidad: tamaño de texto (hasta 200%)
+│       │   └── landingAnimations.js # Animaciones y revelado al scroll de la landing
+│       └── tests/
+│           ├── testUtils.js       # Utilidades del framework de pruebas
+│           ├── authTests.js       # Pruebas de autenticación/identidad
+│           ├── documentTests.js   # Pruebas de documentos
+│           └── adminTests.js      # Pruebas de administración
+├── .gitignore
+├── AUTHORS.md
+├── LICENSE
+└── README.md
 ```
 
 ---
