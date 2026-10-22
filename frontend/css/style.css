@@ -131,6 +131,23 @@ a:hover { color: var(--accent-strong); }
 .vault-card select,
 .vault-card textarea { color: var(--text) !important; }
 
+/* Inputs de las pantallas de acceso (login / registro): el texto que escribe
+   el usuario debe verse en ambos temas (en océano el fondo es oscuro). */
+.bt-auth-card input,
+.bt-auth-card select,
+.bt-auth-card textarea {
+    color: var(--text) !important;
+    background-color: rgba(255,255,255,.06) !important;
+    border-color: var(--border) !important;
+}
+[data-theme="celeste"] .bt-auth-card input,
+[data-theme="celeste"] .bt-auth-card select,
+[data-theme="celeste"] .bt-auth-card textarea {
+    background-color: rgba(0,0,0,.03) !important;
+}
+.bt-auth-card input::placeholder,
+.bt-auth-card textarea::placeholder { color: var(--text-muted) !important; opacity: 1; }
+
 /* Inputs y botones que viven fuera de una tarjeta (p. ej. la barra de
    búsqueda del panel) heredan el tema para no quedar ilegibles. */
 .bt-toolbar input,
