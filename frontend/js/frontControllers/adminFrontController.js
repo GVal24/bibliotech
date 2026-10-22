@@ -293,6 +293,10 @@ async function handleDocSubmit(e) {
     formData.append('year', document.getElementById('docYear').value);
     formData.append('description', document.getElementById('docDescription').value.trim());
 
+    const restore = setButtonLoading(
+        document.getElementById('docSubmitBtn'),
+        editingDocumentId ? 'Guardando...' : 'Subiendo...'
+    );
     try {
         if (editingDocumentId) {
             // Actualización de metadatos (no cambia el archivo)
@@ -321,6 +325,8 @@ async function handleDocSubmit(e) {
         loadDocuments();
     } catch (error) {
         showModal('Error', error.message);
+    } finally {
+        restore();
     }
 }
 

@@ -54,3 +54,27 @@
     document.getElementById('modalBody').textContent = message;
     modal.style.display = 'block';
 }
+
+/**
+ * Pone un botón en estado "cargando": lo deshabilita y le agrega un spinner
+ * + texto. Devuelve una función para restaurarlo a su estado original.
+ * Útil para subidas largas (Cloudinary puede tardar con audio/video).
+ * @param {HTMLButtonElement} btn - botón a bloquear.
+ * @param {string} [loadingText] - texto a mostrar mientras carga.
+ * @returns {Function} restaurar - función que revierte el cambio.
+ */
+function setButtonLoading(btn, loadingText) {
+    if (!btn) return function () {};
+
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+
+    const spinner = document.createElement('span');
+    spinner.className = 'bt-spinner';
+    btn.replaceChildren(spinner, document.createTextNode(' ' + (loadingText || 'Subiendo...')));
+
+    return function restore() {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    };
+}

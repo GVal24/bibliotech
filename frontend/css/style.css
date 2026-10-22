@@ -540,6 +540,21 @@ embed { border-radius: 4px; }
 .bt-footer { color: var(--text-muted); }
 .bt-copyright { font-size: .85rem; opacity: .85; margin-top: 4px; }
 
+/* Spinner de carga (subida de archivos): se muestra dentro del botón */
+.bt-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    vertical-align: -2px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: btSpin .7s linear infinite;
+}
+@keyframes btSpin { to { transform: rotate(360deg); } }
+button[disabled] { opacity: .75; cursor: progress; }
+
 /* =========================================================================
    ESTILO UNIFICADO para las páginas de acceso (login / register)
    Reutiliza el ambiente de la landing: fondo aurora, navbar y tarjeta glass.

@@ -156,6 +156,7 @@ function initContributorForm() {
         formData.append('description', document.getElementById('contribDescription').value.trim());
         formData.append('documentFile', fileInput.files[0]);
 
+        const restore = setButtonLoading(document.getElementById('docSubmitBtn'), 'Enviando...');
         try {
             const result = await apiService.request('/documents/upload', 'POST', formData, true);
             showModal('Enviado', result.message || 'Material enviado para revisión.');
@@ -165,6 +166,8 @@ function initContributorForm() {
             if (toggleBtn) toggleBtn.textContent = '+ Compartir material';
         } catch (error) {
             showModal('Error', error.message);
+        } finally {
+            restore();
         }
     });
 }

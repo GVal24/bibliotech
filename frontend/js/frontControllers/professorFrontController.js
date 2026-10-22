@@ -282,6 +282,7 @@ async function handleDocSubmit(e) {
     formData.append('description', document.getElementById('docDescription').value.trim());
     formData.append('documentFile', fileInput.files[0]);
 
+    const restore = setButtonLoading(document.getElementById('docSubmitBtn'), 'Publicando...');
     try {
         const result = await apiService.request('/documents/upload', 'POST', formData, true);
         showModal('Éxito', result.message || 'Documento publicado.');
@@ -293,5 +294,7 @@ async function handleDocSubmit(e) {
         loadDocuments();
     } catch (error) {
         showModal('Error', error.message);
+    } finally {
+        restore();
     }
 }
