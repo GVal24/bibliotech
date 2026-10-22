@@ -175,7 +175,7 @@ function renderDocumentsTable(documents) {
         const btnRead = document.createElement('button');
         btnRead.className = 'w3-button w3-yellow w3-tiny w3-round';
         btnRead.textContent = 'Leer';
-        btnRead.addEventListener('click', () => authHelper.openViewer(doc.id, { forStaff: true }));
+        btnRead.addEventListener('click', () => openViewer(doc));
 
         const aDownload = document.createElement('a');
         aDownload.className = 'w3-button w3-blue w3-tiny w3-round w3-margin-left';
@@ -247,6 +247,39 @@ function filterCatalogTable(term) {
         const text = row.textContent.toLowerCase();
         row.style.display = !q || text.includes(q) ? '' : 'none';
     });
+}
+
+// Muestra el documento incrustado en la misma página para lectura online.
+// El staff adjunta el token para poder previsualizar también pendientes.
+function openViewer(doc) {
+    const card = document.getElementById('viewerCard');
+    if (!card) return;
+
+    document.getElementById('viewerTitle').textContent = doc.title;
+
+    const token = authHelper.getToken();
+    const embed = document.getElementById('pdfViewer');
+    embed.src = `/api/documents/${doc.id}/file?token=${encodeURIComponent(token || '')}`;
+
+    const downloadBtn = document.getElementById('viewerDownload');
+    if (downloadBtn) {
+        downloadBtn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = authHelper.downloadUrl(doc.id);
+            a.download = doc.filename || '';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        };
+    }
+
+    document.getElementById('viewerClose').onclick = () => {
+        card.style.display = 'none';
+        embed.src = '';
+    };
+
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth' });
 }
 
 async function handleDocSubmit(e) {
