@@ -74,7 +74,8 @@ son exclusivas de usuarios registrados.
 
 ### Backend
 * **Node.js & Express:** Servidor robusto y escalable.
-* **Multer:** Gestión de subida de archivos PDF.
+* **Multer:** Gestión de subida de archivos (disco local o Cloudinary).
+* **Cloudinary:** Almacenamiento de archivos en la nube (modo deploy).
 * **MySQL/MariaDB:** Persistencia relacional con procedimientos almacenados.
 * **jsonwebtoken & bcrypt:** Autenticación y autorización por roles (JWT).
 * **dotenv/cors:** Configuración y CORS.
@@ -99,14 +100,21 @@ Copiar `backend/.env.example` a `backend/.env` y ajustar:
 ```bash
 PORT=3000
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=bibliotech
 DB_PASS=bibliotech
 DB_NAME=bibliotech
+DB_SSL=false
 JWT_SECRET=tu_clave_secreta_super_segura
 NODE_ENV=production
+# Opcional: si se define, los archivos se guardan en Cloudinary (modo deploy)
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
-> El servidor carga el `.env` con `override: true` para que estas variables tengan
-> prioridad sobre variables del sistema que puedan colisionar (por ejemplo `DB_NAME`).
+> El servidor carga el `.env` con `override: true` **sólo en desarrollo** para que estas
+> variables tengan prioridad sobre variables del sistema que puedan colisionar (por ejemplo
+> `DB_NAME`). En producción (`NODE_ENV=production`) se respetan las variables del host (Render).
 
 ### Base de datos
 Con MySQL/MariaDB corriendo en `localhost:3306`, ejecutar como administrador:
@@ -119,11 +127,72 @@ procedimientos almacenados. Incluye datos de prueba (`admin`, `profe`, `pepe`,
 todos con contraseña `12345`).
 Si tu servidor usa otro puerto (p. ej. 3307), ajustá `DB_*` en el `.env`.
 
+---
+
+## Deploy en la nube (Aiven + Render + Cloudinary)
+
+La aplicación está publicada y no depende de la PC de desarrollo:
+
+* **Backend + frontend:** [Render](https://render.com) (Web Service, plan Free).
+* **Base de datos:** [Aiven for MySQL](https://aiven.io) (plan Free) — soporta **procedimientos
+  almacenados**, requisito de este proyecto.
+* **Archivos:** [Cloudinary](https://cloudinary.com) — los documentos subidos se almacenan
+  en la nube (el disco de Render es efímero, por eso **no** se guardan localmente).
+
+> **Nota:** TiDB Cloud Serverless **no** se usa porque no soporta `CREATE PROCEDURE`
+> (la app depende de stored procedures en todas sus operaciones).
+
+### Componentes y modo dual
+
+El código detecta automáticamente el entorno:
+
+* **Base de datos:** `config/db.js` usa `DB_HOST/DB_PORT/DB_USER/DB_PASS/DB_NAME` y activa SSL
+  con `DB_SSL=true` (Aiven lo exige).
+* **Almacenamiento:** `config/multerConfig.js` usa **Cloudinary** si existen las variables
+  `CLOUDINARY_*`; si no, cae al disco local (`uploads/`). `utils/fileHelper.js` borra el archivo
+  del proveedor correspondiente.
+
+### Esquema en una base gestionada
+
+Para proveedores donde la base ya existe y no se pueden crear usuarios/GRANT (Aiven, etc.),
+usar el script adaptado (sin `DROP DATABASE`/`CREATE USER`/`GRANT`):
+
+```bash
+mysql --user <USER> --password=<PASS> --host <HOST> --port <PORT> <DB> < backend/config/init.cloud.sql
+```
+Crea tablas, roles, datos de prueba y los stored procedures. `init.sql` queda para uso local.
+
+### Variables de entorno en Render
+
+```
+NODE_ENV=production
+JWT_SECRET=<clave aleatoria larga>
+DB_HOST=<host de Aiven>
+DB_PORT=<puerto de Aiven>
+DB_USER=avnadmin
+DB_PASS=<password de Aiven>
+DB_NAME=defaultdb
+DB_SSL=true
+CLOUDINARY_CLOUD_NAME=<cloud name>
+CLOUDINARY_API_KEY=<api key>
+CLOUDINARY_API_SECRET=<api secret>
+```
+
+### Configuración del servicio en Render
+
+* **Root Directory:** `backend`
+* **Build Command:** `npm install`
+* **Start Command:** `node server.js`
+* **Instance Type:** `Free`
+
+> En el plan Free el servicio **se duerme** tras ~15 min de inactividad: la primera visita
+> puede tardar ~50 s en despertar (conviene abrir la URL un rato antes de una demo/examen).
+
 ## Estructura del Proyecto
 
 ```bash
 backend/
-  config/          # db, multer, init.sql, delete.sql
+  config/          # db, multer, cloudinaryConfig, init.sql (local), init.cloud.sql (nube), delete.sql
   controllers/     # Lógica de negocio
   middleware/      # Autenticación/autorización
   repositories/    # Acceso a datos (SPs)
