@@ -91,13 +91,11 @@ function renderPendingTable(documents) {
 
         const tdActions = document.createElement('td');
 
-        const btnView = document.createElement('a');
+        const btnView = document.createElement('button');
         btnView.className = 'w3-button w3-blue w3-tiny w3-round';
         btnView.textContent = 'Ver';
-        // El material pendiente solo lo ve el staff: el token debe ir por query
-        // porque <a> no envía el header Authorization.
-        btnView.href = `/api/documents/${doc.id}/file?token=${encodeURIComponent(authHelper.getToken() || '')}#toolbar=0`;
-        btnView.target = '_blank';
+        // Se muestra embebido en la misma página (visión previa del staff).
+        btnView.addEventListener('click', () => openViewer(doc));
 
         const btnApprove = document.createElement('button');
         btnApprove.className = 'w3-button w3-green w3-tiny w3-round w3-margin-left';
