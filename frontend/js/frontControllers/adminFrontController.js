@@ -94,7 +94,9 @@ function renderPendingTable(documents) {
         const btnView = document.createElement('a');
         btnView.className = 'w3-button w3-blue w3-tiny w3-round';
         btnView.textContent = 'Ver';
-        btnView.href = authHelper.viewUrl(doc.id);
+        // El material pendiente solo lo ve el staff: el token debe ir por query
+        // porque <a> no envía el header Authorization.
+        btnView.href = `/api/documents/${doc.id}/file?token=${encodeURIComponent(authHelper.getToken() || '')}#toolbar=0`;
         btnView.target = '_blank';
 
         const btnApprove = document.createElement('button');
