@@ -172,8 +172,13 @@ function renderDocumentsTable(documents) {
 
         const tdActions = document.createElement('td');
 
+        const btnRead = document.createElement('button');
+        btnRead.className = 'w3-button w3-yellow w3-tiny w3-round';
+        btnRead.textContent = 'Leer';
+        btnRead.addEventListener('click', () => authHelper.openViewer(doc.id, { forStaff: true }));
+
         const aDownload = document.createElement('a');
-        aDownload.className = 'w3-button w3-blue w3-tiny w3-round';
+        aDownload.className = 'w3-button w3-blue w3-tiny w3-round w3-margin-left';
         aDownload.textContent = 'Descargar';
         aDownload.href = authHelper.downloadUrl(doc.id);
         aDownload.download = doc.filename;
@@ -188,7 +193,7 @@ function renderDocumentsTable(documents) {
         btnDelete.textContent = 'Borrar';
         btnDelete.addEventListener('click', () => deleteDocument(doc.id));
 
-        tdActions.append(aDownload, btnEdit, btnDelete);
+        tdActions.append(btnRead, aDownload, btnEdit, btnDelete);
 
         row.append(tdTitle, tdAuthor, tdCategory, tdYear, tdActions);
         tbody.appendChild(row);
@@ -197,7 +202,51 @@ function renderDocumentsTable(documents) {
 
 function initDocForm() {
     document.getElementById('docForm').addEventListener('submit', handleDocSubmit);
-    document.getElementById('docCancelBtn').addEventListener('click', resetDocForm);
+    document.getElementById('docCancelBtn').addEventListener('click', () => { resetDocForm(); hideDocForm(); });
+
+    // Formulario discreto: oculto por defecto, se abre con el botón.
+    const toggleBtn = document.getElementById('toggleDocFormBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            const wrap = document.getElementById('docFormWrap');
+            const visible = wrap.style.display !== 'none';
+            if (visible) {
+                resetDocForm();
+                hideDocForm();
+            } else {
+                showDocForm();
+            }
+        });
+    }
+
+    // Búsqueda en el catálogo (filtra en el cliente sobre lo ya cargado).
+    const search = document.getElementById('catalogSearch');
+    if (search) {
+        search.addEventListener('input', () => filterCatalogTable(search.value));
+    }
+}
+
+function showDocForm() {
+    document.getElementById('docFormWrap').style.display = 'block';
+    const btn = document.getElementById('toggleDocFormBtn');
+    if (btn) btn.textContent = 'Cerrar';
+}
+
+function hideDocForm() {
+    document.getElementById('docFormWrap').style.display = 'none';
+    const btn = document.getElementById('toggleDocFormBtn');
+    if (btn) btn.textContent = '+ Agregar documento';
+}
+
+// Filtra las filas del catálogo por texto (título, autor, categoría, año).
+function filterCatalogTable(term) {
+    const tbody = document.getElementById('documentsTableBody');
+    if (!tbody) return;
+    const q = (term || '').toLowerCase().trim();
+    Array.from(tbody.rows).forEach((row) => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = !q || text.includes(q) ? '' : 'none';
+    });
 }
 
 async function handleDocSubmit(e) {
@@ -235,6 +284,7 @@ async function handleDocSubmit(e) {
         }
 
         resetDocForm();
+        hideDocForm();
         loadDocuments();
     } catch (error) {
         showModal('Error', error.message);
@@ -258,7 +308,8 @@ function startEditing(doc) {
     document.getElementById('docFormTitle').textContent = 'Editar Documento';
     setButtonLabel(document.getElementById('docSubmitBtn'), 'GUARDAR CAMBIOS');
     document.getElementById('docCancelBtn').style.display = 'inline-block';
-    document.getElementById('docForm').scrollIntoView({ behavior: 'smooth' });
+    showDocForm();
+    document.getElementById('docFormWrap').scrollIntoView({ behavior: 'smooth' });
 }
 
 // Reemplaza el contenido del botón por un <b> (sin usar innerHTML)

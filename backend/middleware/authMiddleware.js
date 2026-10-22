@@ -97,6 +97,32 @@ const authMiddleware = {
         });
     },
 
+    /**
+     * 5. Verificación OPCIONAL del token.
+     *    Si viene un token válido (por header Authorization o por ?token=),
+     *    decodifica y setea req.userId / req.userRole. Si no viene o es
+     *    inválido, continúa como invitado (sin bloquear).
+     *    Se usa en endpoints públicos que cambian de comportamiento según el rol
+     *    (p. ej. ver material: invitado solo 'approved', staff cualquier estado).
+     */
+    optionalToken: (req, res, next) => {
+        let pureToken = req.query.token;
+        const authHeader = req.headers['authorization'];
+        if (!pureToken && authHeader && authHeader.startsWith('Bearer ')) {
+            pureToken = authHeader.split(' ')[1];
+        }
+
+        if (!pureToken) return next();
+
+        jwt.verify(pureToken, SECRET_KEY, (err, decoded) => {
+            if (!err && decoded) {
+                req.userId = decoded.id;
+                req.userRole = decoded.role;
+            }
+            next();
+        });
+    },
+
     // 4. Alias de compatibilidad hacia atrás: solo Admin.
     //    Es un caso particular de hasRole, así las rutas existentes no cambian.
     isAdmin: (req, res, next) => authMiddleware.hasRole('admin')(req, res, next)

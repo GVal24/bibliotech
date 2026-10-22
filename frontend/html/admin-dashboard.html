@@ -30,7 +30,12 @@
 
     <!-- ======================= SECCIÓN DOCUMENTOS ======================= -->
     <section id="sectionDocs">
-        <div class="w3-card-4 vault-card w3-padding w3-round w3-margin-bottom">
+        <div class="w3-bar w3-margin-bottom" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+            <input class="w3-input w3-border w3-round" type="search" id="catalogSearch" placeholder="Buscar por título, autor, ISBN o categoría..." style="flex:1; min-width:220px;">
+            <button type="button" class="w3-button w3-round w3-border" id="toggleDocFormBtn">+ Agregar documento</button>
+        </div>
+
+        <div class="w3-card-4 vault-card w3-padding w3-round w3-margin-bottom" id="docFormWrap" style="display:none;">
             <h3 class="w3-text-yellow" id="docFormTitle">Agregar Nuevo Documento</h3>
             <form id="docForm">
                 <div class="w3-row-padding">

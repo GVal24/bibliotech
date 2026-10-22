@@ -157,11 +157,18 @@ function renderDocumentsTable(documents) {
         tdYear.textContent = doc.year != null ? doc.year : '';
 
         const tdActions = document.createElement('td');
+
+        const btnRead = document.createElement('button');
+        btnRead.className = 'w3-button w3-yellow w3-tiny w3-round';
+        btnRead.textContent = 'Leer';
+        btnRead.addEventListener('click', () => authHelper.openViewer(doc.id, { forStaff: true }));
+
         const aDownload = document.createElement('a');
-        aDownload.className = 'w3-button w3-blue w3-tiny w3-round';
+        aDownload.className = 'w3-button w3-blue w3-tiny w3-round w3-margin-left';
         aDownload.textContent = 'Descargar';
         aDownload.href = authHelper.downloadUrl(doc.id);
         aDownload.download = doc.filename;
+        tdActions.appendChild(btnRead);
         tdActions.appendChild(aDownload);
 
         // El profesor puede borrar material del catálogo.
@@ -192,6 +199,37 @@ async function deleteDocument(id) {
 
 function initDocForm() {
     document.getElementById('professorDocForm').addEventListener('submit', handleDocSubmit);
+
+    const toggleBtn = document.getElementById('toggleDocFormBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            const wrap = document.getElementById('docFormWrap');
+            const visible = wrap.style.display !== 'none';
+            if (visible) {
+                document.getElementById('professorDocForm').reset();
+                wrap.style.display = 'none';
+                toggleBtn.textContent = '+ Publicar material';
+            } else {
+                wrap.style.display = 'block';
+                toggleBtn.textContent = 'Cerrar';
+            }
+        });
+    }
+
+    const search = document.getElementById('catalogSearch');
+    if (search) {
+        search.addEventListener('input', () => filterCatalogTable(search.value));
+    }
+}
+
+function filterCatalogTable(term) {
+    const tbody = document.getElementById('documentsTableBody');
+    if (!tbody) return;
+    const q = (term || '').toLowerCase().trim();
+    Array.from(tbody.rows).forEach((row) => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = !q || text.includes(q) ? '' : 'none';
+    });
 }
 
 async function handleDocSubmit(e) {
@@ -215,6 +253,10 @@ async function handleDocSubmit(e) {
         const result = await apiService.request('/documents/upload', 'POST', formData, true);
         showModal('Éxito', result.message || 'Documento publicado.');
         e.target.reset();
+        const wrap = document.getElementById('docFormWrap');
+        if (wrap) wrap.style.display = 'none';
+        const toggleBtn = document.getElementById('toggleDocFormBtn');
+        if (toggleBtn) toggleBtn.textContent = '+ Publicar material';
         loadDocuments();
     } catch (error) {
         showModal('Error', error.message);

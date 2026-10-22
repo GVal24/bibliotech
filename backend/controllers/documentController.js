@@ -145,6 +145,19 @@ function initialStatus(role) {
 }
 
 /**
+ * Decide si quien pide puede acceder al archivo de un documento.
+ * - Material aprobado: cualquiera (catálogo público).
+ * - Material pendiente/rechazado: solo admin y professor (cola de aprobación).
+ * @param {object} req - request de Express (puede traer req.userRole).
+ * @param {object} document - documento de la base (trae .status).
+ * @returns {boolean}
+ */
+function canAccessDocument(req, document) {
+    if (document.status === STATUS.APPROVED) return true;
+    return DIRECT_PUBLISH_ROLES.includes(req.userRole);
+}
+
+/**
  * Valida los campos obligatorios comunes a alta y edición de documentos.
  * @returns {ValidationHandler}
  */
@@ -225,14 +238,15 @@ class DocumentController
         }
     }
 
-    // GET /api/documents/:id/file  -> ver online (acceso público)
+    // GET /api/documents/:id/file  -> ver online
+    // Invitados: solo material aprobado. Admin/Professor: cualquier estado.
     async viewFile(req, res)
     {
         try
         {
             const document = await documentRepo.findById(req.params.id);
 
-            if (!document) {
+            if (!document || !canAccessDocument(req, document)) {
                 return res.status(404).json({ message: lang.t('doc.notFound') });
             }
 
@@ -244,14 +258,15 @@ class DocumentController
         }
     }
 
-    // GET /api/documents/:id/download  -> descargar (solo usuarios registrados)
+    // GET /api/documents/:id/download  -> descargar (requiere sesión)
+    // Usuarios comunes: solo material aprobado. Admin/Professor: cualquier estado.
     async downloadFile(req, res)
     {
         try
         {
             const document = await documentRepo.findById(req.params.id);
 
-            if (!document) {
+            if (!document || !canAccessDocument(req, document)) {
                 return res.status(404).json({ message: lang.t('doc.notFound') });
             }
 

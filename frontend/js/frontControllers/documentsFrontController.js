@@ -42,9 +42,10 @@ function initSessionUI() {
         if (loginLink) loginLink.style.display = 'none';
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
 
-        // Un Student logueado puede subir material
-        const contributorCard = document.getElementById('contributorCard');
-        if (contributorCard) contributorCard.style.display = 'block';
+        // Un Student logueado puede subir material: mostramos solo el botón
+        // discreto "+ Compartir material" (el formulario se abre al pulsarlo).
+        const contributorToggle = document.getElementById('contributorToggleWrap');
+        if (contributorToggle) contributorToggle.style.display = 'block';
     }
 }
 
@@ -120,6 +121,24 @@ function initContributorForm() {
     const form = document.getElementById('contributorForm');
     if (!form) return;
 
+    // Toggle discreto del formulario de aporte.
+    const toggleBtn = document.getElementById('toggleContribFormBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            const card = document.getElementById('contributorCard');
+            const visible = card.style.display !== 'none';
+            if (visible) {
+                form.reset();
+                card.style.display = 'none';
+                toggleBtn.textContent = '+ Compartir material';
+            } else {
+                card.style.display = 'block';
+                toggleBtn.textContent = 'Cerrar';
+                card.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -141,6 +160,9 @@ function initContributorForm() {
             const result = await apiService.request('/documents/upload', 'POST', formData, true);
             showModal('Enviado', result.message || 'Material enviado para revisión.');
             form.reset();
+            const card = document.getElementById('contributorCard');
+            if (card) card.style.display = 'none';
+            if (toggleBtn) toggleBtn.textContent = '+ Compartir material';
         } catch (error) {
             showModal('Error', error.message);
         }

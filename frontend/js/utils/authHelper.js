@@ -45,6 +45,23 @@
     },
 
     /**
+     * Abre un documento para lectura online en una pestaña nueva.
+     * Para admin/professor se incluye el token por query, de modo que puedan
+     * previsualizar también material pendiente/rechazado.
+     * @param {number|string} id - id del documento.
+     * @param {object} [options] - { forStaff: boolean } para adjuntar el token.
+     */
+    openViewer(id, options) {
+        const token = this.getToken();
+        const forStaff = options && options.forStaff;
+        let url = this.viewUrl(id);
+        if (forStaff && token) {
+            url += `?token=${encodeURIComponent(token)}`;
+        }
+        window.open(url, '_blank', 'noopener');
+    },
+
+    /**
      * URL de descarga para usuarios registrados. El token viaja por query
      * porque <a>/<embed> no pueden enviar el header Authorization.
      */

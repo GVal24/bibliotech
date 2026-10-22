@@ -56,18 +56,20 @@ function handleUpload(req, res, next) {
     });
 }
 
-const { verifyToken, verifyTokenFromQuery, hasRole } = require('../middleware/authMiddleware');
+const { verifyToken, verifyTokenFromQuery, optionalToken, hasRole } = require('../middleware/authMiddleware');
 
 // --- Lectura del catálogo: ACCESO PÚBLICO (Student invitado sin login) ---
 // Listar o buscar documentos: GET /api/documents  (opcional: ?q=término)
 router.get('/', documentController.listDocuments);
 
-// --- Ver un documento online: PÚBLICO (solo lectura, sin descargar) ---
+// --- Ver un documento online ---
+// Público: los invitados solo ven material aprobado. Con token de admin/professor
+// también se pueden previsualizar documentos pendientes/rechazados.
 // Va ANTES de verifyToken y de '/:id' para que no la capturen otras rutas.
 // GET /api/documents/:id/file
-router.get('/:id/file', documentController.viewFile);
+router.get('/:id/file', optionalToken, documentController.viewFile);
 
-// --- Descargar: SOLO usuarios registrados ---
+// --- Descargar: requiere sesión (usuarios registrados) ---
 // El navegador pide el archivo con <a>/<embed>, que no pueden enviar el header
 // Authorization; por eso el token viaja por query string (?token=...).
 // GET /api/documents/:id/download?token=<jwt>
