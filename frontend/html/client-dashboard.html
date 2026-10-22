@@ -9,7 +9,7 @@
     <script src="../js/utils/themeSwitcher.js?v=a11y2"></script>
     <script src="../js/utils/fontSizeControl.js?v=a11y2"></script>
 </head>
-<body>
+<body class="bt-landing bt-page">
 
 <div class="w3-bar bt-nav">
     <span class="w3-bar-item bt-brand">
@@ -24,7 +24,7 @@
     </span>
 </div>
 
-<div class="w3-container w3-padding-32">
+<div class="bt-main w3-container w3-padding-32">
 
     <div class="w3-card-4 vault-card w3-padding w3-round w3-margin-bottom">
         <h3 class="w3-text-yellow">Buscar en el catálogo</h3>
@@ -123,9 +123,19 @@
 
 </div>
 
+<footer class="w3-container w3-center w3-padding-24 bt-footer">
+    <p class="bt-copyright">&copy; <span id="btYear"></span> Guillermina Valdez. Todos los derechos reservados.</p>
+</footer>
+
 <script src="../js/services/apiService.js"></script>
 <script src="../js/components/uiHandlers.js"></script>
 <script src="../js/utils/authHelper.js"></script>
 <script src="../js/frontControllers/documentsFrontController.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var y = document.getElementById('btYear');
+        if (y) y.textContent = String(new Date().getFullYear());
+    });
+</script>
 </body>
 </html>
