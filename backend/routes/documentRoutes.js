@@ -20,9 +20,27 @@ const lang = require('../utils/lang/LanguageManager');
 function handleUpload(req, res, next) {
     uploadMiddleware(req, res, (err) => {
         if (err) {
-            const isSize = err.code === 'LIMIT_FILE_SIZE';
-            return res.status(400).json({
-                message: isSize ? lang.t('file.tooLarge') : lang.t('file.type.only'),
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ message: lang.t('file.tooLarge') });
+            }
+            if (err.code === 'NO_EXTENSION') {
+                return res.status(400).json({
+                    message: lang.t('file.noExtension'),
+                    error: err.message
+                });
+            }
+            if (err.code === 'BAD_EXTENSION') {
+                return res.status(400).json({
+                    message: lang.t('file.type.only') + ' ' +
+                             'La extensión "' + (err.extension || '') + '" no está permitida. ' +
+                             'Extensiones válidas: PDF, EPUB, DOC, DOCX, TXT, MD, PPT, PPTX, XLS, XLSX, imágenes, audio y video.',
+                    error: err.message
+                });
+            }
+            // Cualquier otro error (por ejemplo, de almacenamiento en la nube):
+            // mostramos el detalle real para que sea diagnosticable.
+            return res.status(500).json({
+                message: 'No se pudo procesar el archivo. ' + (err.message || 'Error desconocido.'),
                 error: err.message
             });
         }

@@ -92,9 +92,18 @@ const fileFilter = (req, file, cb) => {
     if (ALLOWED_EXTENSIONS.includes(ext)) {
         cb(null, true);
     }
-    else {
-        const error = new Error('Tipo de archivo no permitido: ' + (ext || 'sin extensión'));
+    else if (ext === '') {
+        // Sin extensión: caso típico cuando Windows oculta extensiones.
+        const error = new Error('El archivo "' + file.originalname + '" no tiene extensión.');
         error.status = 400;
+        error.code = 'NO_EXTENSION';
+        cb(error, false);
+    }
+    else {
+        const error = new Error('Extensión "' + ext + '" no permitida. Permitidas: ' + ALLOWED_EXTENSIONS.join(', '));
+        error.status = 400;
+        error.code = 'BAD_EXTENSION';
+        error.extension = ext;
         cb(error, false);
     }
 };

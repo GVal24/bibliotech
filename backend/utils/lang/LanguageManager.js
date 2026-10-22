@@ -17,6 +17,7 @@ const LanguageManager = {
             'field.invalid': 'El campo es inválido.',
             'file.pdf.only': 'Solo se permiten archivos PDF.',
             'file.type.only': 'Tipo de archivo no permitido.',
+            'file.noExtension': 'El archivo no tiene extensión. Renombralo agregando una extensión válida (por ejemplo: .pdf).',
             'file.tooLarge': 'El archivo supera el tamaño máximo permitido (60 MB).',
             'file.required': 'Debes adjuntar un archivo.',
 
@@ -65,6 +66,7 @@ const LanguageManager = {
             'field.invalid': 'Field is invalid.',
             'file.pdf.only': 'Only PDF files are allowed.',
             'file.type.only': 'File type not allowed.',
+            'file.noExtension': 'The file has no extension. Rename it by adding a valid extension (for example: .pdf).',
             'file.tooLarge': 'File exceeds the maximum allowed size (60 MB).',
             'file.required': 'You must attach a file.',
 
