@@ -116,11 +116,35 @@ a:hover { color: var(--accent-strong); }
 /* ---------- Texto de acento ---------- */
 .w3-text-yellow { color: var(--accent) !important; }
 
+/* Encabezado de sección que respeta el tema (evita texto blanco ilegible
+   sobre el fondo claro del tema "celeste"). */
+.bt-heading { color: var(--text) !important; }
+.bt-subtext { color: var(--text-muted) !important; }
+
+/* En el tema claro, "w3-text-white" (usado en títulos fuera de tarjetas)
+   se vuelve ilegible: lo alineamos al color de texto del tema. */
+[data-theme="celeste"] .bt-content .w3-text-white { color: var(--text) !important; }
+
 /* ---------- Inputs ---------- */
 .bt-nav input,
 .vault-card input,
 .vault-card select,
 .vault-card textarea { color: var(--text) !important; }
+
+/* Inputs y botones que viven fuera de una tarjeta (p. ej. la barra de
+   búsqueda del panel) heredan el tema para no quedar ilegibles. */
+.bt-toolbar input,
+.bt-toolbar select,
+.bt-toolbar textarea { color: var(--text) !important; background-color: var(--surface) !important; }
+.bt-toolbar input::placeholder { color: var(--text-muted) !important; opacity: 1; }
+.bt-toolbar button.w3-border {
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+.bt-toolbar button.w3-border:hover {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+}
 
 .vault-card input.w3-border,
 .vault-card select.w3-border,
@@ -318,3 +342,189 @@ a:hover { color: var(--accent-strong); }
 
 /* ---------- Visor de PDF ---------- */
 embed { border-radius: 4px; }
+
+/* =========================================================================
+   LANDING REDISEÑADA (más innovadora, con transiciones)
+   Nuevas clases con prefijo bt- , coexisten con el resto sin romper nada.
+   ========================================================================= */
+
+/* Fondo con degradado suave y "aurora" animada */
+.bt-landing {
+    background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(77,184,255,.18), transparent 60%),
+        radial-gradient(1000px 500px at 100% 0%, rgba(0,120,216,.16), transparent 55%),
+        var(--bg);
+}
+
+.bt-hero-modern {
+    position: relative;
+    overflow: hidden;
+    min-height: 78vh;
+    isolation: isolate;
+}
+.bt-hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 56px 16px 72px;
+    width: 100%;
+}
+
+/* Orbes flotantes de fondo */
+.bt-aurora {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(60px);
+    opacity: .55;
+}
+.bt-orb {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+}
+.bt-orb-1 {
+    width: 340px; height: 340px; left: 6%; top: 12%;
+    background: radial-gradient(circle, var(--accent), transparent 70%);
+    animation: btFloat1 16s ease-in-out infinite;
+}
+.bt-orb-2 {
+    width: 420px; height: 420px; right: 4%; top: 4%;
+    background: radial-gradient(circle, var(--accent-2), transparent 70%);
+    animation: btFloat2 20s ease-in-out infinite;
+}
+.bt-orb-3 {
+    width: 300px; height: 300px; left: 45%; bottom: -8%;
+    background: radial-gradient(circle, var(--accent-strong), transparent 70%);
+    animation: btFloat1 24s ease-in-out infinite reverse;
+}
+@keyframes btFloat1 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(40px, -30px, 0) scale(1.12); }
+}
+@keyframes btFloat2 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(-50px, 35px, 0) scale(1.08); }
+}
+
+/* Hero: logo y título con brillo */
+.bt-hero-modern .bt-hero-logo {
+    max-width: 300px;
+    animation: btFloatSoft 6s ease-in-out infinite;
+}
+@keyframes btFloatSoft {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
+}
+.bt-hero-modern .bt-hero-title {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    letter-spacing: 6px;
+    background: linear-gradient(90deg, var(--text), var(--accent), var(--text));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: btShine 6s linear infinite;
+    text-shadow: none;
+}
+@keyframes btShine {
+    to { background-position: 200% center; }
+}
+
+/* Botón con halo animado */
+.bt-btn-glow {
+    position: relative;
+    box-shadow: 0 0 0 0 rgba(77,184,255,.55);
+    animation: btPulse 2.6s ease-out infinite;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.bt-btn-glow:hover { transform: translateY(-3px) scale(1.03); }
+@keyframes btPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(77,184,255,.45); }
+    70%  { box-shadow: 0 0 0 16px rgba(77,184,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(77,184,255,0); }
+}
+
+/* Indicador de scroll */
+.bt-scroll-hint {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.bt-scroll-hint span {
+    display: block;
+    width: 26px;
+    height: 42px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    position: relative;
+}
+.bt-scroll-hint span::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    width: 5px; height: 5px;
+    margin-left: -2.5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: btScrollDot 1.8s ease-in-out infinite;
+}
+@keyframes btScrollDot {
+    0%   { transform: translateY(0); opacity: 1; }
+    70%  { transform: translateY(14px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 0; }
+}
+
+/* Tarjetas de características con hover */
+.bt-feature-hover {
+    transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+}
+.bt-feature-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(0,0,0,.28);
+    border-color: var(--accent);
+}
+
+/* Divisor animado bajo los títulos */
+.bt-divider {
+    height: 3px;
+    width: 0;
+    max-width: 160px;
+    margin: 6px auto 26px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.bt-divider.bt-reveal.is-visible { width: 160px; transition: width .9s ease .1s; }
+
+/* Revelado al hacer scroll */
+.bt-reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity .7s ease var(--reveal-delay, 0s),
+                transform .7s ease var(--reveal-delay, 0s);
+}
+.bt-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Footer con copyright */
+.bt-footer { color: var(--text-muted); }
+.bt-copyright { font-size: .85rem; opacity: .85; margin-top: 4px; }
+
+/* Respeto por accesibilidad: sin movimiento si el usuario lo pide */
+@media (prefers-reduced-motion: reduce) {
+    .bt-orb, .bt-hero-modern .bt-hero-logo, .bt-hero-modern .bt-hero-title,
+    .bt-btn-glow, .bt-scroll-hint span::after {
+        animation: none !important;
+    }
+    .bt-reveal { opacity: 1; transform: none; transition: none; }
+}

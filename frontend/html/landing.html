@@ -10,7 +10,7 @@
     <script src="../js/utils/themeSwitcher.js?v=a11y2"></script>
     <script src="../js/utils/fontSizeControl.js?v=a11y2"></script>
 </head>
-<body>
+<body class="bt-landing">
 
 <div class="w3-bar bt-nav">
     <span class="w3-bar-item bt-brand">
@@ -28,37 +28,48 @@
 </div>
 
 <!-- ======================= HERO ======================= -->
-<section class="bt-hero">
-    <img src="../img/logo.png" alt="Logo Bibliotech" class="bt-hero-logo">
-    <h1 class="bt-hero-title"><b>BIBLIOTECH</b></h1>
-    <p class="bt-hero-tagline">
-        Tu biblioteca digital, abierta las 24 horas: explorá, compartí y consultá material
-        bibliográfico en distintos formatos, al alcance de un clic.
-        Entre todos creamos una comunidad excepcional. Sólo nos faltás vos.
-    </p>
-    <div class="bt-hero-actions">
-        <a href="/catalog" class="w3-button w3-yellow w3-round-large w3-padding-large"><b>EXPLORAR EL CATÁLOGO</b></a>
-        <a href="/register" class="w3-button bt-btn-ghost w3-round-large w3-padding-large"><b>CREAR MI CUENTA</b></a>
+<section class="bt-hero bt-hero-modern">
+    <div class="bt-aurora" aria-hidden="true">
+        <span class="bt-orb bt-orb-1"></span>
+        <span class="bt-orb bt-orb-2"></span>
+        <span class="bt-orb bt-orb-3"></span>
+    </div>
+
+    <div class="bt-hero-content">
+        <img src="../img/logo.png" alt="Logo Bibliotech" class="bt-hero-logo bt-reveal">
+        <h1 class="bt-hero-title bt-reveal" style="--reveal-delay:.08s;"><b>BIBLIOTECH</b></h1>
+        <p class="bt-hero-tagline bt-reveal" style="--reveal-delay:.16s;">
+            Tu biblioteca digital, abierta las 24 horas: explorá, compartí y consultá material
+            bibliográfico en distintos formatos, al alcance de un clic.
+            Entre todos creamos una comunidad excepcional. Sólo nos faltás vos.
+        </p>
+        <div class="bt-hero-actions bt-reveal" style="--reveal-delay:.24s;">
+            <a href="/catalog" class="w3-button w3-yellow w3-round-large w3-padding-large bt-btn-glow"><b>EXPLORAR EL CATÁLOGO</b></a>
+            <a href="/register" class="w3-button bt-btn-ghost w3-round-large w3-padding-large"><b>CREAR MI CUENTA</b></a>
+        </div>
+        <div class="bt-scroll-hint bt-reveal" style="--reveal-delay:.4s;" aria-hidden="true">
+            <span></span>
+        </div>
     </div>
 </section>
 
 <!-- ======================= CARACTERÍSTICAS ======================= -->
-<div class="w3-container w3-padding-32" style="max-width:1100px;margin:0 auto;">
+<div class="w3-container w3-padding-32 bt-section" style="max-width:1100px;margin:0 auto;">
     <div class="w3-row-padding">
-        <div class="w3-col l4 m12 s12 w3-margin-bottom">
-            <div class="bt-feature">
+        <div class="w3-col l4 m12 s12 w3-margin-bottom bt-reveal">
+            <div class="bt-feature bt-feature-hover">
                 <h3>Un catálogo que crece con vos</h3>
                 <p>Miles de mentes, un solo lugar. Explorá el material y leelo al instante, incluso sin iniciar sesión.</p>
             </div>
         </div>
-        <div class="w3-col l4 m12 s12 w3-margin-bottom">
-            <div class="bt-feature">
+        <div class="w3-col l4 m12 s12 w3-margin-bottom bt-reveal" style="--reveal-delay:.1s;">
+            <div class="bt-feature bt-feature-hover">
                 <h3>Tu aporte, en primera fila</h3>
                 <p>¿Tenés apuntes que valen oro? Proponelos y que la comunidad los descubra. Los profesores revisan cada aporte para mantener la calidad.</p>
             </div>
         </div>
-        <div class="w3-col l4 m12 s12 w3-margin-bottom">
-            <div class="bt-feature">
+        <div class="w3-col l4 m12 s12 w3-margin-bottom bt-reveal" style="--reveal-delay:.2s;">
+            <div class="bt-feature bt-feature-hover">
                 <h3>Tres roles, un objetivo</h3>
                 <p>Estudiante, Profesor y Administrador trabajan en equipo con permisos claros y un flujo de aprobación transparente.</p>
             </div>
@@ -67,23 +78,24 @@
 </div>
 
 <!-- ======================= ROLES ======================= -->
-<div class="w3-container w3-padding-16" style="max-width:1100px;margin:0 auto;">
-    <h2 class="w3-center">¿Cómo funcionamos?</h2>
+<div class="w3-container w3-padding-16 bt-section" style="max-width:1100px;margin:0 auto;">
+    <h2 class="w3-center bt-heading bt-reveal">¿Cómo funcionamos?</h2>
+    <div class="bt-divider bt-reveal" aria-hidden="true"></div>
     <div class="w3-row-padding">
-        <div class="w3-col l4 m12 s12 w3-margin-bottom">
-            <div class="bt-feature">
+        <div class="w3-col l4 m12 s12 w3-margin-bottom bt-reveal">
+            <div class="bt-feature bt-feature-hover">
                 <h3>Estudiante</h3>
                 <p>Descubrí material, leelo online y descargalo con tu cuenta. Compartí tus apuntes: cada aporte queda <em>pendiente</em> hasta que un profesor lo aprueba y se publica en el catálogo.</p>
             </div>
         </div>
-        <div class="w3-col l4 m12 s12 w3-margin-bottom">
-            <div class="bt-feature">
+        <div class="w3-col l4 m12 s12 w3-margin-bottom bt-reveal" style="--reveal-delay:.1s;">
+            <div class="bt-feature bt-feature-hover">
                 <h3>Profesor</h3>
                 <p>Compartí material de forma directa y sé el filtro de calidad: aprobá o rechazá lo que proponen los estudiantes, y mantené el catálogo al día.</p>
             </div>
         </div>
-        <div class="w3-col l4 m12 s12 w3-margin-bottom">
-            <div class="bt-feature">
+        <div class="w3-col l4 m12 s12 w3-margin-bottom bt-reveal" style="--reveal-delay:.2s;">
+            <div class="bt-feature bt-feature-hover">
                 <h3>Administrador</h3>
                 <p>Tené la visión completa: gestioná documentos, usuarios y roles para que toda la biblioteca funcione como un reloj.</p>
             </div>
@@ -91,12 +103,14 @@
     </div>
 </div>
 
-<footer class="w3-container w3-center w3-padding-32" style="color:var(--text-muted);">
+<footer class="w3-container w3-center w3-padding-32 bt-footer">
     <p>Bibliotech &mdash; ISFT N°151 &middot; Marzo 2026</p>
+    <p class="bt-copyright">&copy; <span id="btYear"></span> Guillermina Valdez. Todos los derechos reservados.</p>
 </footer>
 
 <script src="../js/services/apiService.js"></script>
 <script src="../js/utils/authHelper.js"></script>
 <script src="../js/frontControllers/landingFrontController.js"></script>
+<script src="../js/utils/landingAnimations.js"></script>
 </body>
 </html>
