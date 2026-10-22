@@ -188,6 +188,24 @@ CLOUDINARY_API_SECRET=<api secret>
 > En el plan Free el servicio **se duerme** tras ~15 min de inactividad: la primera visita
 > puede tardar ~50 s en despertar (conviene abrir la URL un rato antes de una demo/examen).
 
+### Usuarios de prueba
+
+El script `init.cloud.sql` (y también `init.sql`) carga tres usuarios listos para usar,
+uno por rol (contraseña **`12345`** para todos):
+
+| Usuario | Contraseña | Rol | Para qué sirve |
+| --- | --- | --- | --- |
+| `admin` | `12345` | **Administrador** | Gestión total: documentos, usuarios y **asignación de roles**. |
+| `profe` | `12345` | **Profesor** | Publica material directo y aprueba/rechaza lo propuesto. |
+| `pepe` | `12345` | **Estudiante** | Consulta el catálogo y propone material (queda `pending`). |
+
+**Probar el cambio de roles** (solo el Admin puede):
+1. Iniciar sesión con `admin` / `12345`.
+2. Ir a `/admin-dashboard` → pestaña de **usuarios**.
+3. Cambiar el rol de `pepe` (o `profe`) y guardar.
+
+> ⚠️ No cambies el rol del propio `admin`: perderías el acceso de administrador.
+
 ## Estructura del Proyecto
 
 ```bash
