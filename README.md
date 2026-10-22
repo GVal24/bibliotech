@@ -5,6 +5,9 @@
 > **Tipo de sistema:** Aplicación Web (multipágina) — Arquitectura de N capas con API REST.
 > No es una SPA con framework: las vistas son HTML servidas por Express y la lógica de UI es JavaScript nativo.
 
+> 🔗 **App en vivo (demo):** [https://bibliotech-96m7.onrender.com](https://bibliotech-96m7.onrender.com)
+> Usuarios de prueba listos para usar: `admin`, `profe` y `pepe` (contraseña `12345`). Ver *Usuarios de prueba*.
+
 ---
 
 ## 🎯 Características Principales
@@ -188,6 +191,8 @@ Si tu servidor usa otro puerto (p. ej. 3307), ajustá `DB_*` en el `.env`.
 ## ☁️ Deploy en la nube (Aiven + Render + Cloudinary)
 
 La aplicación está publicada y no depende de la PC de desarrollo:
+
+🔗 **URL pública:** [https://bibliotech-96m7.onrender.com](https://bibliotech-96m7.onrender.com)
 
 * 🖥️ **Backend + frontend:** [Render](https://render.com) (Web Service).
 * 🗄️ **Base de datos:** [Aiven for MySQL](https://aiven.io).
