@@ -169,6 +169,18 @@ a:hover { color: var(--accent-strong); }
 
 .vault-card select option { background-color: var(--surface); color: var(--text); }
 
+/* Selector de rol de la tabla de usuarios: W3.CSS no le pone fondo y el
+   navegador usa blanco por defecto, así que en el tema oscuro el texto claro
+   quedaba casi invisible. Forzamos los colores del tema activo. */
+.w3-table select {
+    background-color: var(--surface) !important;
+    color: var(--text) !important;
+}
+.w3-table select option {
+    background-color: var(--surface);
+    color: var(--text);
+}
+
 /* ---------- Botones ---------- */
 .w3-button.w3-yellow,
 .bt-btn {
@@ -603,6 +615,72 @@ button[disabled] { opacity: .75; cursor: progress; }
 /* Footer fijo al pie cuando el contenido es corto */
 .bt-page { display: flex; flex-direction: column; min-height: 100vh; }
 .bt-page > .bt-main { flex: 1 1 auto; }
+
+/* =========================================================================
+   RESPONSIVE - celulares y tablets
+   Las páginas de los paneles declaran width=device-width; estos ajustes
+   hacen que la barra superior, las pestañas y el contenido entren en
+   pantallas angostas sin desbordar horizontalmente.
+   ========================================================================= */
+@media (max-width: 768px) {
+    /* Barra superior: los ítems fluyen y bajan de línea si no entran. */
+    .bt-nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 8px;
+    }
+    .bt-nav .w3-bar-item {
+        float: none !important;
+        padding: 4px 6px;
+    }
+    .bt-nav .bt-brand {
+        flex: 1 1 100%;
+        font-size: .92rem;
+        letter-spacing: .5px;
+        line-height: 1.35;
+        white-space: normal;
+    }
+    .bt-nav .bt-logo { height: 26px; margin-right: 6px; }
+    .bt-nav .bt-subtitle { display: none; }
+    /* Los botones de tema y sesión viven dentro de su propio contenedor:
+       los alineamos en fila (W3 los flota y se apilaban uno debajo del otro). */
+    .bt-nav [data-theme-toggle],
+    .bt-nav #sessionArea {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+    }
+    .bt-nav [data-theme-toggle] .bt-theme-toggle { float: none !important; }
+    .bt-nav .bt-theme-toggle { padding: 5px 9px !important; font-size: .78rem; }
+    .bt-nav .bt-a11y-btn { padding: 6px !important; }
+    .bt-nav .btn-logout,
+    .bt-nav .w3-button.w3-yellow,
+    .bt-nav .bt-btn-ghost { padding: 5px 10px !important; font-size: .82rem; }
+
+    /* Pestañas de los paneles: se reparten y bajan de línea. */
+    .bt-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 4px;
+        overflow: visible !important;
+    }
+    .bt-tabs .tab-btn { flex: 1 1 auto; padding: 8px 10px; font-size: .9rem; }
+
+    /* Márgenes laterales más chicos para ganar ancho útil. */
+    .bt-main.w3-container { padding-left: 10px; padding-right: 10px; }
+    .bt-main.w3-padding-32 { padding-top: 16px !important; padding-bottom: 16px !important; }
+
+    /* Visor embebido (solo navegadores de escritorio en ventanas angostas):
+       nunca más alto que la pantalla. */
+    #pdfViewer { height: 70vh; }
+
+    /* La columna de acciones no parte los botones en varias líneas. */
+    .w3-table td:last-child { white-space: nowrap; }
+}
 
 /* Respeto por accesibilidad: sin movimiento si el usuario lo pide */
 @media (prefers-reduced-motion: reduce) {

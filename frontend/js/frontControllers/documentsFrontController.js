@@ -174,6 +174,15 @@ function initContributorForm() {
 
 // Muestra el documento incrustado en la misma página para lectura online
 function openViewer(doc) {
+    // En celulares y tablets los navegadores no muestran PDFs dentro de un
+    // <embed>, así que se abre el documento en una pestaña nueva para que lo
+    // muestre el visor nativo del sistema. En escritorio se mantiene el visor
+    // embebido de siempre.
+    if (authHelper.isMobileDevice()) {
+        authHelper.openViewer(doc.id);
+        return;
+    }
+
     const card = document.getElementById('viewerCard');
     if (!card) return;
 

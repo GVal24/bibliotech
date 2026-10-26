@@ -38,10 +38,42 @@
     },
 
     /**
+     * Determina si la página se está viendo en un celular o tablet.
+     * Los navegadores móviles (Android / iOS) no muestran PDFs dentro de
+     * <embed> ni de <iframe>: en esos dispositivos hay que usar el visor
+     * nativo del sistema (abriendo el archivo en una pestaña nueva).
+     * iPadOS 13+ se identifica como "Macintosh", por eso se detecta con el
+     * soporte táctil.
+     * @returns {boolean}
+     */
+    isMobileDevice() {
+        const ua = navigator.userAgent || '';
+        const isIPadOS = /Macintosh/i.test(ua) && navigator.maxTouchPoints > 1;
+        return isIPadOS || /Android|iPhone|iPad|iPod|Mobile|Tablet|Kindle|Silk|Opera Mini|IEMobile|Windows Phone|BlackBerry/i.test(ua);
+    },
+
+    /**
      * URL pública para ver un documento online (sin descargar).
      */
     viewUrl(id) {
         return `/api/documents/${id}/file`;
+    },
+
+    /**
+     * Abre una URL en una pestaña nueva usando un enlace real.
+     * Se usa un <a> en lugar de window.open porque los bloqueadores de
+     * pop-ups suelen bloquear window.open, pero no la navegación de un
+     * enlace disparada por un click del usuario.
+     * @param {string} url - dirección a abrir.
+     */
+    openUrlInNewTab(url) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
     },
 
     /**
@@ -58,7 +90,7 @@
         if (forStaff && token) {
             url += `?token=${encodeURIComponent(token)}`;
         }
-        window.open(url, '_blank', 'noopener');
+        this.openUrlInNewTab(url);
     },
 
     /**
