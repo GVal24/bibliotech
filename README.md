@@ -19,6 +19,9 @@
 * **Flujo de aprobación:** El material de los Students se revisa antes de publicarse.
 * **Baja de usuario sin perder material:** Al eliminar un usuario sus documentos **se conservan**.
 * **Accesibilidad:** El navbar incluye un **ícono de accesibilidad** con un panel y deslizador para agrandar el texto de todo el sitio **hasta el 200%**, pensado para personas con baja visión.
+* **Diseño responsive:** La barra superior, las pestañas, las tablas y el visor se adaptan automáticamente al ancho de celulares y tablets, sin scroll horizontal.
+* **Lectura en celulares y tablets:** En dispositivos móviles el documento se abre en una pestaña nueva con el **visor nativo del sistema** (los navegadores móviles no muestran PDFs embebidos); en escritorio se mantiene el visor integrado en la página.
+* **Temas visuales:** Dos paletas (Océano y Celeste) y todos los controles —incluidos los selectores de rol de la tabla de usuarios— respetan el contraste del tema activo.
 * **Arquitectura limpia:** Separación de responsabilidades entre controladores, repositorios, servicios y utilidades (N capas).
 * **Validación modular (filtros) + Manejador de lenguaje:** Validación desacoplada del dominio y mensajes centralizados ES/EN.
 * **Control de tipos de archivo:** Lista blanca de extensiones (ver *Formatos admitidos*) y límite de tamaño.
@@ -251,6 +254,27 @@ node server.js
 ```
 3. Acceder desde el navegador a `http://localhost:3000` (página de inicio).
 4. Roles: Admin (gestión total y roles) / Professor (publica y aprueba) / Student (consulta, propone y descarga).
+
+### 📱 Uso en celulares y tablets
+
+La interfaz es responsive: se adapta sola al ancho de la pantalla, sin necesidad de configurar nada.
+Al tocar **Leer**, el documento se abre en una **pestaña nueva** con el visor nativo del dispositivo
+(en Android/iOS los navegadores no muestran PDFs dentro de la página). Para volver a la biblioteca,
+cerrá esa pestaña: la sesión y el catálogo siguen abiertos en la pestaña original.
+
+---
+
+## 🩺 Problemas frecuentes
+
+* **No puedo entrar al panel de administración:** usá el usuario `admin` con contraseña `12345`.
+  Si el panel te devuelve al login, la sesión (JWT) expiró: dura **2 horas**. Cerrá sesión con
+  **Salir** y volvé a ingresar.
+* **Aparece "Acceso denegado" al abrir un panel:** la cuenta con la que iniciaste sesión no tiene
+  ese rol (por ejemplo, `profe` no puede entrar al panel de administración).
+* **La primera visita tarda ~50 s:** el servicio gratuito de Render se duerme por inactividad
+  (ver *Deploy en la nube*).
+* **En el celular el PDF no se ve dentro de la página:** comportamiento esperado. Se abre en una
+  pestaña nueva con el visor del sistema.
 
 ---
 
