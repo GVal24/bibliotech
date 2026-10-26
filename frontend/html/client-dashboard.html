@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bibliotech - Catálogo</title>
     <link rel="stylesheet" href="../css/w3.css">
-    <link rel="stylesheet" href="../css/style.css?v=a11y3">
+    <link rel="stylesheet" href="../css/style.css?v=a11y4">
     <link rel="icon" type="image/png" href="../img/favicon.png">
     <script src="../js/utils/themeSwitcher.js?v=a11y2"></script>
     <script src="../js/utils/fontSizeControl.js?v=a11y2"></script>
@@ -117,6 +117,7 @@
             </div>
             <div class="w3-col s4 w3-right-align">
                 <button id="viewerDownload" class="w3-button w3-blue w3-round w3-margin-top">Descargar</button>
+                <button id="viewerClose" class="w3-button w3-grey w3-round w3-margin-top">Cerrar</button>
             </div>
         </div>
         <embed id="pdfViewer" type="application/pdf" width="100%" height="700px">
@@ -131,6 +132,8 @@
 <script src="../js/services/apiService.js"></script>
 <script src="../js/components/uiHandlers.js"></script>
 <script src="../js/utils/authHelper.js"></script>
+<script src="../js/vendor/pdfjs/pdf.min.js"></script>
+<script src="../js/utils/mobilePdfReader.js?v=a11y4"></script>
 <script src="../js/frontControllers/documentsFrontController.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {

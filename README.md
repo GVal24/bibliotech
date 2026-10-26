@@ -20,7 +20,7 @@
 * **Baja de usuario sin perder material:** Al eliminar un usuario sus documentos **se conservan**.
 * **Accesibilidad:** El navbar incluye un **ícono de accesibilidad** con un panel y deslizador para agrandar el texto de todo el sitio **hasta el 200%**, pensado para personas con baja visión.
 * **Diseño responsive:** La barra superior, las pestañas, las tablas y el visor se adaptan automáticamente al ancho de celulares y tablets, sin scroll horizontal.
-* **Lectura en celulares y tablets:** En dispositivos móviles el documento se abre en una pestaña nueva con el **visor nativo del sistema** (los navegadores móviles no muestran PDFs embebidos); en escritorio se mantiene el visor integrado en la página.
+* **Lectura en celulares y tablets:** En dispositivos móviles el PDF se dibuja **dentro de la página** con un visor propio basado en **PDF.js** (los navegadores móviles no muestran PDFs embebidos con `<embed>`/`<iframe>`). En escritorio se mantiene el visor nativo integrado.
 * **Temas visuales:** Dos paletas (Océano y Celeste) y todos los controles —incluidos los selectores de rol de la tabla de usuarios— respetan el contraste del tema activo.
 * **Arquitectura limpia:** Separación de responsabilidades entre controladores, repositorios, servicios y utilidades (N capas).
 * **Validación modular (filtros) + Manejador de lenguaje:** Validación desacoplada del dominio y mensajes centralizados ES/EN.
@@ -42,6 +42,7 @@
 * 🟨 **Vanilla JavaScript:** Lógica pura, sin frameworks pesados.
 * 🎨 **W3.CSS:** CSS ligero y responsivo.
 * 🧱 **Web Components:** UI dinámica mediante nodos nativos.
+* 📄 **PDF.js:** Renderizado de PDFs en `<canvas>` para la lectura embebida en celulares y tablets.
 
 ---
 
@@ -135,9 +136,12 @@ bibliotech/
 │       │   └── apiService.js      # Cliente Fetch hacia la API (inyecta el JWT)
 │       ├── utils/
 │       │   ├── authHelper.js      # Ciclo de vida de la sesión (localStorage, token, roles)
+│       │   ├── mobilePdfReader.js # Visor PDF embebido para celulares/tablets (PDF.js + canvas)
 │       │   ├── themeSwitcher.js   # Selector de tema (oceano/celeste) persistente
 │       │   ├── fontSizeControl.js # Control de accesibilidad: tamaño de texto (hasta 200%)
 │       │   └── landingAnimations.js # Animaciones y revelado al scroll de la landing
+│       ├── vendor/
+│       │   └── pdfjs/             # PDF.js (build UMD, worker y licencia Apache 2.0)
 │       └── tests/
 │           ├── testUtils.js       # Utilidades del framework de pruebas
 │           ├── authTests.js       # Pruebas de autenticación/identidad
@@ -258,9 +262,12 @@ node server.js
 ### 📱 Uso en celulares y tablets
 
 La interfaz es responsive: se adapta sola al ancho de la pantalla, sin necesidad de configurar nada.
-Al tocar **Leer**, el documento se abre en una **pestaña nueva** con el visor nativo del dispositivo
-(en Android/iOS los navegadores no muestran PDFs dentro de la página). Para volver a la biblioteca,
-cerrá esa pestaña: la sesión y el catálogo siguen abiertos en la pestaña original.
+Al tocar **Leer**, el documento se abre **dentro de la misma página** en un visor propio, con botones
+para pasar de página, porcentaje de zoom y deslizamiento horizontal. En el celular/tablet ese visor
+dibuja cada página con **PDF.js** en un `<canvas>`, porque los navegadores móviles no muestran PDFs
+dentro de `<embed>`/`<iframe>`. En escritorio se conserva el visor PDF nativo del navegador.
+Los formatos que no son PDF (EPUB, imágenes, audio, video) se abren en una pestaña nueva para que los
+maneje el sistema.
 
 ---
 
@@ -273,8 +280,9 @@ cerrá esa pestaña: la sesión y el catálogo siguen abiertos en la pestaña or
   ese rol (por ejemplo, `profe` no puede entrar al panel de administración).
 * **La primera visita tarda ~50 s:** el servicio gratuito de Render se duerme por inactividad
   (ver *Deploy en la nube*).
-* **En el celular el PDF no se ve dentro de la página:** comportamiento esperado. Se abre en una
-  pestaña nueva con el visor del sistema.
+* **El visor no muestra el documento:** asegurate de tener la última versión de la página
+  (recargá con `Ctrl+F5` o borrá la caché del navegador). Si el archivo no es un PDF válido,
+  el visor muestra el error correspondiente.
 
 ---
 

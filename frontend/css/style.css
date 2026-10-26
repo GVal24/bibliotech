@@ -617,6 +617,99 @@ button[disabled] { opacity: .75; cursor: progress; }
 .bt-page > .bt-main { flex: 1 1 auto; }
 
 /* =========================================================================
+   VISOR DE PDF PARA CELULARES Y TABLETS (PDF.js)
+   Los navegadores móviles no renderizan PDFs dentro de <embed>/<iframe>,
+   así que mobilePdfReader.js dibuja cada página en un <canvas> dentro de la
+   misma tarjeta del visor.
+   ========================================================================= */
+.bt-pdf-reader { margin-top: 12px; }
+.bt-pdf-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+}
+.bt-pdf-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.bt-pdf-btn:hover { background: var(--accent-strong); }
+.bt-pdf-btn:disabled { opacity: .45; cursor: default; }
+.bt-pdf-btn-small { font-size: 1.25rem; }
+.bt-pdf-page,
+.bt-pdf-zoom {
+    color: var(--text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.bt-pdf-page { font-size: .92rem; }
+.bt-pdf-zoom { min-width: 3.2em; text-align: center; font-size: .85rem; }
+.bt-pdf-spacer { flex: 1 1 auto; }
+.bt-pdf-stage {
+    position: relative;
+    max-height: 72vh;
+    margin-top: 8px;
+    padding: 8px 0;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+    text-align: center;
+}
+.bt-pdf-canvas {
+    display: block;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, .28);
+}
+.bt-pdf-canvas[hidden] { display: none; }
+.bt-pdf-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 220px;
+    padding: 24px 12px;
+    color: var(--text-muted);
+    text-align: center;
+}
+.bt-pdf-status[hidden] { display: none; }
+.bt-pdf-retry,
+.bt-pdf-fallback {
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+.bt-pdf-retry[hidden],
+.bt-pdf-fallback[hidden] { display: none; }
+
+@media (max-width: 768px) {
+    .bt-pdf-toolbar { gap: 6px; padding: 6px; }
+    .bt-pdf-btn { min-width: 42px; min-height: 42px; }
+    .bt-pdf-stage { max-height: 68vh; }
+}
+
+/* =========================================================================
    RESPONSIVE - celulares y tablets
    Las páginas de los paneles declaran width=device-width; estos ajustes
    hacen que la barra superior, las pestañas y el contenido entren en

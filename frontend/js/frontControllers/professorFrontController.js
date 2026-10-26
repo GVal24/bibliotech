@@ -236,11 +236,15 @@ function filterCatalogTable(term) {
 // El staff adjunta el token para poder previsualizar también pendientes.
 function openViewer(doc) {
     // En celulares y tablets los navegadores no muestran PDFs dentro de un
-    // <embed>, así que se abre el documento en una pestaña nueva para que lo
-    // muestre el visor nativo del sistema. En escritorio se mantiene el visor
-    // embebido de siempre.
+    // <embed>: se dibuja el documento en la misma página con PDF.js.
+    // Los formatos que no son PDF se abren en una pestaña nueva.
     if (authHelper.isMobileDevice()) {
-        authHelper.openViewer(doc.id, { forStaff: true });
+        if (mobilePdfReader.isPdf(doc)) {
+            openPdfInPage(doc, authHelper.fileUrl(doc.id, { forStaff: true }));
+        } else {
+            closeViewer();
+            authHelper.openViewer(doc.id, { forStaff: true });
+        }
         return;
     }
 
@@ -249,9 +253,9 @@ function openViewer(doc) {
 
     document.getElementById('viewerTitle').textContent = doc.title;
 
-    const token = authHelper.getToken();
     const embed = document.getElementById('pdfViewer');
-    embed.src = `/api/documents/${doc.id}/file?token=${encodeURIComponent(token || '')}#toolbar=0`;
+    embed.style.display = '';
+    embed.src = authHelper.fileUrl(doc.id, { forStaff: true }) + '#toolbar=0';
 
     const downloadBtn = document.getElementById('viewerDownload');
     if (downloadBtn) {
@@ -268,9 +272,48 @@ function openViewer(doc) {
     document.getElementById('viewerClose').onclick = () => {
         card.style.display = 'none';
         embed.src = '';
+        mobilePdfReader.close();
     };
 
     card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeViewer() {
+    const card = document.getElementById('viewerCard');
+    const embed = document.getElementById('pdfViewer');
+    if (card) card.style.display = 'none';
+    if (embed) embed.src = '';
+    mobilePdfReader.close();
+}
+
+// Visor embebido para celulares/tablets: PDF.js dibuja las páginas en un
+// <canvas>, porque esos navegadores no renderizan PDFs con <embed>.
+function openPdfInPage(doc, url) {
+    const card = document.getElementById('viewerCard');
+    if (!card) return;
+
+    document.getElementById('viewerTitle').textContent = doc.title;
+
+    const downloadBtn = document.getElementById('viewerDownload');
+    if (downloadBtn) {
+        downloadBtn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = authHelper.downloadUrl(doc.id);
+            a.download = doc.filename || '';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        };
+    }
+
+    document.getElementById('viewerClose').onclick = () => {
+        card.style.display = 'none';
+        mobilePdfReader.close();
+    };
+
+    card.style.display = 'block';
+    mobilePdfReader.open({ url: url });
     card.scrollIntoView({ behavior: 'smooth' });
 }
 

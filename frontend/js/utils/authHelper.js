@@ -40,8 +40,8 @@
     /**
      * Determina si la página se está viendo en un celular o tablet.
      * Los navegadores móviles (Android / iOS) no muestran PDFs dentro de
-     * <embed> ni de <iframe>: en esos dispositivos hay que usar el visor
-     * nativo del sistema (abriendo el archivo en una pestaña nueva).
+     * <embed> ni de <iframe>: en esos dispositivos se usa el visor PDF.js
+     * embebido (mobilePdfReader.js).
      * iPadOS 13+ se identifica como "Macintosh", por eso se detecta con el
      * soporte táctil.
      * @returns {boolean}
@@ -57,6 +57,23 @@
      */
     viewUrl(id) {
         return `/api/documents/${id}/file`;
+    },
+
+    /**
+     * URL del archivo para el visor. Para admin/professor se agrega el token
+     * por query, de modo que puedan previsualizar también material pendiente.
+     * @param {number|string} id - id del documento.
+     * @param {object} [options] - { forStaff: boolean }.
+     * @returns {string}
+     */
+    fileUrl(id, options) {
+        const forStaff = options && options.forStaff;
+        const token = this.getToken();
+        let url = this.viewUrl(id);
+        if (forStaff && token) {
+            url += `?token=${encodeURIComponent(token)}`;
+        }
+        return url;
     },
 
     /**
@@ -84,13 +101,7 @@
      * @param {object} [options] - { forStaff: boolean } para adjuntar el token.
      */
     openViewer(id, options) {
-        const token = this.getToken();
-        const forStaff = options && options.forStaff;
-        let url = this.viewUrl(id);
-        if (forStaff && token) {
-            url += `?token=${encodeURIComponent(token)}`;
-        }
-        this.openUrlInNewTab(url);
+        this.openUrlInNewTab(this.fileUrl(id, options));
     },
 
     /**

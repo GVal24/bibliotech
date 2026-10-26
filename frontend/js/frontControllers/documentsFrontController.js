@@ -174,24 +174,33 @@ function initContributorForm() {
 
 // Muestra el documento incrustado en la misma página para lectura online
 function openViewer(doc) {
+    const card = document.getElementById('viewerCard');
+    const embed = document.getElementById('pdfViewer');
+    const closeButton = document.getElementById('viewerClose');
+    if (closeButton) closeButton.onclick = closeViewer;
+
     // En celulares y tablets los navegadores no muestran PDFs dentro de un
-    // <embed>, así que se abre el documento en una pestaña nueva para que lo
-    // muestre el visor nativo del sistema. En escritorio se mantiene el visor
-    // embebido de siempre.
+    // <embed>: se dibuja el documento en la misma página con PDF.js.
+    // Los formatos que no son PDF (epub, imágenes, audio, etc.) se abren en
+    // una pestaña nueva para que los maneje el sistema.
     if (authHelper.isMobileDevice()) {
-        authHelper.openViewer(doc.id);
+        if (mobilePdfReader.isPdf(doc)) {
+            openPdfInPage(doc, authHelper.fileUrl(doc.id));
+        } else {
+            closeViewer();
+            authHelper.openViewer(doc.id);
+        }
         return;
     }
 
-    const card = document.getElementById('viewerCard');
     if (!card) return;
 
     document.getElementById('viewerTitle').textContent = doc.title;
 
-    const embed = document.getElementById('pdfViewer');
     // Endpoint público de lectura (inline). No requiere token.
     // #toolbar=0 oculta la barra del visor PDF del navegador para desalentar
     // el guardado directo desde el visor (la descarga "real" exige token).
+    embed.style.display = '';
     embed.src = `/api/documents/${doc.id}/file#toolbar=0`;
 
     const downloadBtn = document.getElementById('viewerDownload');
@@ -200,6 +209,32 @@ function openViewer(doc) {
     }
 
     card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeViewer() {
+    const card = document.getElementById('viewerCard');
+    const embed = document.getElementById('pdfViewer');
+    if (card) card.style.display = 'none';
+    if (embed) embed.src = '';
+    mobilePdfReader.close();
+}
+
+// Visor embebido para celulares/tablets: PDF.js dibuja las páginas en un
+// <canvas>, porque esos navegadores no renderizan PDFs con <embed>.
+function openPdfInPage(doc, url) {
+    const card = document.getElementById('viewerCard');
+    if (!card) return;
+
+    document.getElementById('viewerTitle').textContent = doc.title;
+
+    const downloadBtn = document.getElementById('viewerDownload');
+    if (downloadBtn) {
+        downloadBtn.onclick = () => requestDownload(doc);
+    }
+
+    card.style.display = 'block';
+    mobilePdfReader.open({ url: url });
     card.scrollIntoView({ behavior: 'smooth' });
 }
 
